@@ -9,6 +9,8 @@
 #include <cstdio>
 #include <cstdlib>
 
+void processInput(GLFWwindow* window);
+
 int main(int argc, char * argv[]) {
 
     // Load GLFW and Create a Window
@@ -32,9 +34,7 @@ int main(int argc, char * argv[]) {
     fprintf(stderr, "OpenGL %s\n", glGetString(GL_VERSION));
 
     // Rendering Loop
-    while (glfwWindowShouldClose(mWindow) == false) {
-        if (glfwGetKey(mWindow, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-            glfwSetWindowShouldClose(mWindow, true);
+    while (!glfwWindowShouldClose(mWindow)) {
 
         // Background Fill Color
         glClearColor(0.25f, 0.25f, 0.25f, 1.0f);
@@ -43,6 +43,12 @@ int main(int argc, char * argv[]) {
         // Flip Buffers and Draw
         glfwSwapBuffers(mWindow);
         glfwPollEvents();
+        processInput(mWindow);
     }   glfwTerminate();
     return EXIT_SUCCESS;
+}
+
+void processInput(GLFWwindow* mWindow){
+    if (glfwGetKey(mWindow, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+        glfwSetWindowShouldClose(mWindow, true);
 }
