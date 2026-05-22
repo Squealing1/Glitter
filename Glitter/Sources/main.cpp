@@ -18,6 +18,19 @@ namespace shapes {
        -0.5f, -0.5f, 0.0f,  // bottom-left
        0.5f, -0.5f, 0.0f,  // bottom-right
     };
+    
+    float rect[] = {
+        -0.5, 0.5f, 0.0f, //top-left
+        0.5, 0.5f, 0.0f, //top-right
+        0.5, -0.5f, 0.0f, //bottom-right
+        -0.5, -0.5f, 0.0f, //bottom-left
+    };
+    
+    unsigned int rect_ind[] = {
+        0, 1, 2,
+        0, 2, 3,
+
+    };
 
 };
 
@@ -102,13 +115,16 @@ int main(int argc, char * argv[]) {
     glDeleteShader(vertex_shader);
     glDeleteShader(fragment_shader);
     
-    unsigned int VBO;
+    unsigned int VBO, VAO, EBO;
     glGenBuffers(1, &VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(shapes::r_tri), shapes::r_tri, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(shapes::rect), shapes::rect, GL_STATIC_DRAW);
+    
+    glGenBuffers(1,&EBO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(shapes::rect_ind), shapes::rect_ind, GL_STATIC_DRAW);
     
     
-    unsigned int VAO;
     glGenVertexArrays(1, &VAO);
     glBindVertexArray(VAO);
     unsigned int dimensions = 3;
@@ -120,12 +136,15 @@ int main(int argc, char * argv[]) {
     while (!glfwWindowShouldClose(mWindow)) {
 
         // Background Fill Color
-        glClearColor(0.25f, 0.25f, 0.25f, 1.0f);
+        glClearColor(0.0f, 0.5f, 0.5f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
         glUseProgram(shaderProgram);
         glBindVertexArray(VAO);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+        //glDrawArrays(GL_TRIANGLES, 0, 3);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        glBindVertexArray(0);
 
         // Flip Buffers and Draw
         glfwSwapBuffers(mWindow);
