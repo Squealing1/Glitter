@@ -7,19 +7,23 @@ set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 add_subdirectory(Glitter/Vendor/glfw)
 
-# Vendor: Assimp
-set(ASSIMP_BUILD_ASSIMP_TOOLS OFF CACHE BOOL "" FORCE)
-set(ASSIMP_BUILD_SAMPLES OFF CACHE BOOL "" FORCE)
-set(ASSIMP_BUILD_TESTS OFF CACHE BOOL "" FORCE)
-add_subdirectory(Glitter/Vendor/assimp)
+# NONEED STR
 
-# Vendor: Bullet
-set(BUILD_BULLET2_DEMOS OFF CACHE BOOL "" FORCE)
-set(BUILD_CPU_DEMOS OFF CACHE BOOL "" FORCE)
-set(BUILD_EXTRAS OFF CACHE BOOL "" FORCE)
-set(BUILD_OPENGL3_DEMOS OFF CACHE BOOL "" FORCE)
-set(BUILD_UNIT_TESTS OFF CACHE BOOL "" FORCE)
-add_subdirectory(Glitter/Vendor/bullet)
+# # Vendor: Assimp
+# set(ASSIMP_BUILD_ASSIMP_TOOLS OFF CACHE BOOL "" FORCE)
+# set(ASSIMP_BUILD_SAMPLES OFF CACHE BOOL "" FORCE)
+# set(ASSIMP_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+# add_subdirectory(Glitter/Vendor/assimp)
+# 
+# # Vendor: Bullet
+# set(BUILD_BULLET2_DEMOS OFF CACHE BOOL "" FORCE)
+# set(BUILD_CPU_DEMOS OFF CACHE BOOL "" FORCE)
+# set(BUILD_EXTRAS OFF CACHE BOOL "" FORCE)
+# set(BUILD_OPENGL3_DEMOS OFF CACHE BOOL "" FORCE)
+# set(BUILD_UNIT_TESTS OFF CACHE BOOL "" FORCE)
+# add_subdirectory(Glitter/Vendor/bullet)
+
+# NONEED END
 
 # Vendor: GLAD (compiled as part of main target)
 add_library(glad STATIC Glitter/Vendor/glad/src/glad.c)
@@ -53,8 +57,10 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
 
 target_include_directories(${PROJECT_NAME} PRIVATE
     Glitter/Headers/
-    Glitter/Vendor/assimp/include/
-    Glitter/Vendor/bullet/src/
+# NONEED STR
+#    Glitter/Vendor/assimp/include/
+#    Glitter/Vendor/bullet/src/
+# NONEED END
     Glitter/Vendor/glm/
     Glitter/Vendor/stb/)
 
@@ -64,12 +70,14 @@ if(NOT WIN32 AND NOT MSVC)
 endif()
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
-    assimp
     glfw
     glad
-    BulletDynamics
-    BulletCollision
-    LinearMath
+# NONEED STR
+#    assimp
+#    BulletDynamics
+#    BulletCollision
+#    LinearMath
+# NONEED END
     ${PLATFORM_LIBRARIES})
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
