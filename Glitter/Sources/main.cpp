@@ -48,6 +48,31 @@ const char* fragment_shader_source =
 "FragColor = vec4(0.5f,0.0f,0.0f,1.0f);\n"
 "}\n";
 
+void create_shape(unsigned int &VAO, unsigned int &VBO, unsigned int& EBO, 
+    float vert[], unsigned int vert_cnt, unsigned int ind[], 
+    unsigned int ind_cnt, unsigned int dimensions);
+
+void create_shape(unsigned int &VAO, unsigned int &VBO, unsigned int& EBO, 
+    float vert[], unsigned int vert_cnt, unsigned int ind[], 
+    unsigned int ind_cnt, unsigned int dimensions){
+
+        glGenBuffers(1, &VBO);
+        glBindBuffer(GL_ARRAY_BUFFER, VBO);
+        glBufferData(GL_ARRAY_BUFFER, vert_cnt*sizeof(float), vert, GL_STATIC_DRAW);
+        
+        glGenBuffers(1,&EBO);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, ind_cnt*sizeof(unsigned int), ind, GL_STATIC_DRAW);
+        
+        
+        glGenVertexArrays(1, &VAO);
+        glBindVertexArray(VAO);
+        glVertexAttribPointer(0, dimensions, GL_FLOAT, GL_FALSE, dimensions * sizeof(float), (void*)0);
+        glEnableVertexAttribArray(0);
+    }
+
+
+
 int main(int argc, char * argv[]) {
 
     // Load GLFW and Create a Window
@@ -116,20 +141,8 @@ int main(int argc, char * argv[]) {
     glDeleteShader(fragment_shader);
     
     unsigned int VBO, VAO, EBO;
-    glGenBuffers(1, &VBO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(shapes::rect), shapes::rect, GL_STATIC_DRAW);
     
-    glGenBuffers(1,&EBO);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(shapes::rect_ind), shapes::rect_ind, GL_STATIC_DRAW);
-    
-    
-    glGenVertexArrays(1, &VAO);
-    glBindVertexArray(VAO);
-    unsigned int dimensions = 3;
-    glVertexAttribPointer(0, dimensions, GL_FLOAT, GL_FALSE, dimensions * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
+    create_shape(VAO, VBO, EBO, shapes::rect, 12, shapes::rect_ind, 6, 3);
     
 
     // Rendering Loop
@@ -142,7 +155,6 @@ int main(int argc, char * argv[]) {
         glUseProgram(shaderProgram);
         glBindVertexArray(VAO);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-        //glDrawArrays(GL_TRIANGLES, 0, 3);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
 
