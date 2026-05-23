@@ -10,6 +10,7 @@
 #include <cstdlib>
 #include <iostream>
 
+void drawShape(unsigned int &VAO, unsigned int &EBO, unsigned int &shaderProgram);
 void processInput(GLFWwindow* window);
 
 namespace shapes {
@@ -152,11 +153,7 @@ int main(int argc, char * argv[]) {
         glClearColor(0.0f, 0.5f, 0.5f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        glUseProgram(shaderProgram);
-        glBindVertexArray(VAO);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-        glBindVertexArray(0);
+        drawShape(VAO, EBO, shaderProgram);
 
         // Flip Buffers and Draw
         glfwSwapBuffers(mWindow);
@@ -167,6 +164,14 @@ int main(int argc, char * argv[]) {
         
     }   glfwTerminate();
     return EXIT_SUCCESS;
+}
+
+void drawShape(unsigned int &VAO, unsigned int &EBO, unsigned int &shaderProgram){
+    glUseProgram(shaderProgram);
+    glBindVertexArray(VAO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    glBindVertexArray(0);
 }
 
 void processInput(GLFWwindow* mWindow){
