@@ -43,7 +43,9 @@ source_group("Sources" FILES ${PROJECT_SOURCES})
 add_executable(${PROJECT_NAME}
     ${PROJECT_SOURCES}
     ${PROJECT_HEADERS}
-    ${PROJECT_SHADERS})
+    ${PROJECT_SHADERS}
+    Glitter/Sources/shader.cpp
+    Glitter/Headers/shader.hpp)
 
 target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_17)
 

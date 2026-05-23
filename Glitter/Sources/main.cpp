@@ -1,5 +1,7 @@
 // Local Headers
 #include "glitter.hpp"
+#include "glm/ext/vector_float4.hpp"
+#include <shader.hpp>
 
 // System Headers
 #include <glad/glad.h>
@@ -10,7 +12,7 @@
 #include <cstdlib>
 #include <iostream>
 
-void drawShape(unsigned int &VAO, unsigned int &EBO, unsigned int &shaderProgram);
+void drawShape(unsigned int &VAO, unsigned int &EBO, Shader shader, unsigned int vert_cnt);
 void drawShape(unsigned int &VAO, unsigned int &EBO, unsigned int &shaderProgram, unsigned int vert_cnt);
 void create_shape(unsigned int &VAO, unsigned int &VBO, unsigned int& EBO, 
     float vert[], unsigned int vert_cnt, unsigned int ind[], 
@@ -83,50 +85,7 @@ int main(int argc, char * argv[]) {
     gladLoadGL();
     fprintf(stderr, "OpenGL %s\n", glGetString(GL_VERSION));
 
-    unsigned int vertex_shader;
-    vertex_shader = glCreateShader(GL_VERTEX_SHADER);
-
-    glShaderSource(vertex_shader, 1, &vertex_shader_source, NULL);
-    glCompileShader(vertex_shader);
-    
-    int success;
-    char infoLog[512];
-    glGetShaderiv(vertex_shader, GL_COMPILE_STATUS, &success);
-    
-    if (!success){
-        glGetShaderInfoLog(vertex_shader, 512, NULL, infoLog);
-        std::cout << "ERROR: " << infoLog << std::endl;
-    }
-
-    unsigned int fragment_shader;
-    fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
-
-    glShaderSource(fragment_shader, 1, &fragment_shader_source, NULL);
-    glCompileShader(fragment_shader);
-    
-    glGetShaderiv(fragment_shader, GL_COMPILE_STATUS, &success);
-    
-    if (!success){
-        glGetShaderInfoLog(fragment_shader, 512, NULL, infoLog);
-        std::cout << "ERROR: " << infoLog << std::endl;
-    }
-    
-    unsigned int shaderProgram;
-    shaderProgram = glCreateProgram();
-
-    glAttachShader(shaderProgram, vertex_shader);
-    glAttachShader(shaderProgram, fragment_shader);
-    glLinkProgram(shaderProgram);
-    glUseProgram(shaderProgram);
-    
-    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-    if (!success){
-        glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-        std::cout << "ERROR: " << infoLog << std::endl;
-    }
-    
-    glDeleteShader(vertex_shader);
-    glDeleteShader(fragment_shader);
+    Shader shader(vertex_shader_source, fragment_shader_source);
     
     unsigned int VBO, VAO, EBO;
     unsigned int VBO2, VAO2, EBO2;
@@ -134,8 +93,9 @@ int main(int argc, char * argv[]) {
     create_shape(VAO, VBO, EBO, shapes::rect, 12, shapes::rect_ind, 6, 3);
     create_shape(VAO2, VBO2, EBO2, shapes::r_tri, 9, shapes::r_tri_ind, 3, 3);
     
-    unsigned int uniform_loc = glGetUniformLocation(shaderProgram, "aColor");
-
+    
+    glm::vec4 aColor1(0.5f,0.5f,0.0f,1.0f);
+    glm::vec4 aColor2(0.1f,0.0f,0.5f,1.0f);
     // Rendering Loop
     while (!glfwWindowShouldClose(mWindow)) {
 
@@ -144,10 +104,12 @@ int main(int argc, char * argv[]) {
         glClear(GL_COLOR_BUFFER_BIT);
 
 
-        glUniform4f(uniform_loc, 0.5f,0.5f,0.0f,1.0f);
-        drawShape(VAO, EBO, shaderProgram,6);
-        glUniform4f(uniform_loc, 0.1f,0.0f,0.5f,1.0f);
-        drawShape(VAO2, EBO, shaderProgram, 3);
+        
+        shader.use();
+        shader.setUniform("aColor", aColor1);
+        drawShape(VAO, EBO, shader,6);
+        shader.setUniform("aColor", aColor2);
+        drawShape(VAO2, EBO, shader, 3);
 
         // Flip Buffers and Draw
         glfwSwapBuffers(mWindow);
@@ -160,8 +122,8 @@ int main(int argc, char * argv[]) {
     return EXIT_SUCCESS;
 }
 
-void drawShape(unsigned int &VAO, unsigned int &EBO, unsigned int &shaderProgram, unsigned int vert_cnt){
-    glUseProgram(shaderProgram);
+void drawShape(unsigned int &VAO, unsigned int &EBO, Shader shader, unsigned int vert_cnt){
+    shader.use();
     glBindVertexArray(VAO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     glDrawElements(GL_TRIANGLES, vert_cnt, GL_UNSIGNED_INT, 0);
