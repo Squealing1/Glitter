@@ -45,20 +45,6 @@ namespace shapes {
 
 };
 
-const char* vertex_shader_source = 
-"#version 330 core\n"
-"layout (location = 0) in vec3 aPos;\n"
-"void main(){\n"
-"gl_Position = vec4(aPos,1.0);\n"
-"}\n";
-
-const char* fragment_shader_source = 
-"#version 330 core\n"
-"out vec4 FragColor;\n"
-"uniform vec4 aColor;\n"
-"void main(){\n"
-"FragColor = aColor;\n"
-"}\n";
 
 
 
@@ -85,7 +71,7 @@ int main(int argc, char * argv[]) {
     gladLoadGL();
     fprintf(stderr, "OpenGL %s\n", glGetString(GL_VERSION));
 
-    Shader shader(vertex_shader_source, fragment_shader_source);
+    Shader shader("Glitter/Shaders/shader.vs", "Glitter/Shaders/shader.fs");
     
     unsigned int VBO, VAO, EBO;
     unsigned int VBO2, VAO2, EBO2;
