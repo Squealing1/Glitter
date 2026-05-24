@@ -93,8 +93,10 @@ int main(int argc, char * argv[]) {
         
         shader.use();
         shader.setUniform("aColor", aColor1);
+        shader.setUniform("offset",glm::vec3(0));
         drawShape(VAO, EBO, shader,6);
         shader.setUniform("aColor", aColor2);
+        shader.setUniform("offset",glm::vec3(0.5,0,0));
         drawShape(VAO2, EBO, shader, 3);
 
         // Flip Buffers and Draw
