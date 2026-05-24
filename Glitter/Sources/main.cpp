@@ -71,17 +71,15 @@ int main(int argc, char * argv[]) {
     gladLoadGL();
     fprintf(stderr, "OpenGL %s\n", glGetString(GL_VERSION));
 
-    Shader shader("Glitter/Shaders/shader.vs", "Glitter/Shaders/shader.fs");
+    Shader shader("Glitter/Shaders/posColor.vs",
+         "Glitter/Shaders/posColor.fs");
     
     unsigned int VBO, VAO, EBO;
     unsigned int VBO2, VAO2, EBO2;
     
-    create_shape(VAO, VBO, EBO, shapes::rect, 12, shapes::rect_ind, 6, 3);
     create_shape(VAO2, VBO2, EBO2, shapes::r_tri, 9, shapes::r_tri_ind, 3, 3);
     
     
-    glm::vec4 aColor1(0.5f,0.5f,0.0f,1.0f);
-    glm::vec4 aColor2(0.1f,0.0f,0.5f,1.0f);
     // Rendering Loop
     while (!glfwWindowShouldClose(mWindow)) {
 
@@ -92,10 +90,7 @@ int main(int argc, char * argv[]) {
 
         
         shader.use();
-        shader.setUniform("aColor", aColor1);
-        drawShape(VAO, EBO, shader,6);
-        shader.setUniform("aColor", aColor2);
-        drawShape(VAO2, EBO, shader, 3);
+        drawShape(VAO2, EBO2, shader, 3);
 
         // Flip Buffers and Draw
         glfwSwapBuffers(mWindow);
