@@ -10,6 +10,7 @@
 // Standard Headers
 #include <cstdio>
 #include <cstdlib>
+#include <stb_image.h>
 #include <iostream>
 
 void drawShape(unsigned int &VAO, unsigned int &EBO, Shader shader, unsigned int vert_cnt);

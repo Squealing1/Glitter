@@ -45,7 +45,8 @@ add_executable(${PROJECT_NAME}
     ${PROJECT_HEADERS}
     ${PROJECT_SHADERS}
     Glitter/Sources/shader.cpp
-    Glitter/Headers/shader.hpp)
+    Glitter/Headers/shader.hpp
+    Glitter/Sources/stb_image.cpp)
 
 target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_17)
 
