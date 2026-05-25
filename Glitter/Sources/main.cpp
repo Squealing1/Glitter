@@ -14,10 +14,13 @@
 #include <iostream>
 
 void drawShape(unsigned int &VAO, unsigned int &EBO, Shader shader, unsigned int vert_cnt);
-void drawShape(unsigned int &VAO, unsigned int &EBO, unsigned int &shaderProgram, unsigned int vert_cnt);
+void drawTexturedShape(unsigned int &VAO, unsigned int &EBO, Shader shader, unsigned int vert_cnt, unsigned int texture);
 void create_shape(unsigned int &VAO, unsigned int &VBO, unsigned int& EBO, 
     float vert[], unsigned int vert_cnt, unsigned int ind[], 
     unsigned int ind_cnt, unsigned int dimensions);
+void create_colored_textued_shape(unsigned int &VAO, unsigned int &VBO, unsigned int& EBO, 
+    float vert[], unsigned int vert_cnt, unsigned int ind[], 
+    unsigned int ind_cnt);
 void processInput(GLFWwindow* window);
 
 namespace shapes {
@@ -32,10 +35,11 @@ namespace shapes {
     };
     
     float rect[] = {
-        -0.5, 0.5f, 0.0f, //top-left
-        0.5, 0.5f, 0.0f, //top-right
-        0.5, -0.5f, 0.0f, //bottom-right
-        -0.5, -0.5f, 0.0f, //bottom-left
+        // position         color           texture coor
+        -0.5,  0.5f, 0.0f,  1.0f, 1.0f, 0.0f,  0.0f, 1.0f,//top-left
+         0.5,  0.5f, 0.0f,  1.0f, 0.0f, 0.0f,  1.0f, 1.0f, //top-right
+         0.5, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,  1.0f, 0.0f, //bottom-right
+        -0.5, -0.5f, 0.0f,  0.0f, 0.0f, 1.0f,  0.0f, 0.0f, //bottom-left
     };
     
     unsigned int rect_ind[] = {
@@ -71,18 +75,39 @@ int main(int argc, char * argv[]) {
     glfwMakeContextCurrent(mWindow);
     gladLoadGL();
     fprintf(stderr, "OpenGL %s\n", glGetString(GL_VERSION));
+    
+
+    int width, height, nrChannels;
+    unsigned char* data = stbi_load("Glitter/Textures/container.jpg", &width, &height, &nrChannels, 0);
+
+    
+    unsigned int texture;
+    glGenTextures(1, &texture);
+    
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    
+    glBindTexture(GL_TEXTURE_2D, texture);
+    
+    if (data){
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+    }
+    else {
+        std::cout << "Failed to load texture" << std::endl;
+    }
+    stbi_image_free(data);
+
 
     Shader shader("Glitter/Shaders/shader.vs", "Glitter/Shaders/shader.fs");
     
     unsigned int VBO, VAO, EBO;
-    unsigned int VBO2, VAO2, EBO2;
     
-    create_shape(VAO, VBO, EBO, shapes::rect, 12, shapes::rect_ind, 6, 3);
-    create_shape(VAO2, VBO2, EBO2, shapes::r_tri, 9, shapes::r_tri_ind, 3, 3);
+    create_colored_textued_shape(VAO, VBO, EBO, shapes::rect, 8*4, shapes::rect_ind, 6);
     
     
-    glm::vec4 aColor1(0.5f,0.5f,0.0f,1.0f);
-    glm::vec4 aColor2(0.1f,0.0f,0.5f,1.0f);
     // Rendering Loop
     while (!glfwWindowShouldClose(mWindow)) {
 
@@ -92,11 +117,7 @@ int main(int argc, char * argv[]) {
 
 
         
-        shader.use();
-        shader.setUniform("aColor", aColor1);
-        drawShape(VAO, EBO, shader,6);
-        shader.setUniform("aColor", aColor2);
-        drawShape(VAO2, EBO, shader, 3);
+        drawTexturedShape(VAO, EBO, shader, 6, texture);
 
         // Flip Buffers and Draw
         glfwSwapBuffers(mWindow);
@@ -109,6 +130,14 @@ int main(int argc, char * argv[]) {
     return EXIT_SUCCESS;
 }
 
+void drawTexturedShape(unsigned int &VAO, unsigned int &EBO, Shader shader, unsigned int vert_cnt, unsigned int texture){
+    shader.use();
+    glBindTexture(GL_TEXTURE_2D, texture);
+    glBindVertexArray(VAO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glDrawElements(GL_TRIANGLES, vert_cnt, GL_UNSIGNED_INT, 0);
+    glBindVertexArray(0);
+}
 void drawShape(unsigned int &VAO, unsigned int &EBO, Shader shader, unsigned int vert_cnt){
     shader.use();
     glBindVertexArray(VAO);
@@ -139,4 +168,34 @@ void create_shape(unsigned int &VAO, unsigned int &VBO, unsigned int& EBO,
         glBindVertexArray(VAO);
         glVertexAttribPointer(0, dimensions, GL_FLOAT, GL_FALSE, dimensions * sizeof(float), (void*)0);
         glEnableVertexAttribArray(0);
+    }
+
+void create_colored_textued_shape(unsigned int &VAO, unsigned int &VBO, unsigned int& EBO, 
+    float vert[], unsigned int vert_cnt, unsigned int ind[], 
+    unsigned int ind_cnt){
+    
+        
+        
+        glGenBuffers(1, &VBO);
+        glBindBuffer(GL_ARRAY_BUFFER, VBO);
+        glBufferData(GL_ARRAY_BUFFER, vert_cnt*sizeof(float), vert, GL_STATIC_DRAW);
+        
+        glGenBuffers(1,&EBO);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, ind_cnt*sizeof(unsigned int), ind, GL_STATIC_DRAW);
+        
+        unsigned int dimensions = 3;
+        unsigned int color_atts = 3;
+        unsigned int tex_dimensions = 2;
+        
+        unsigned int total = dimensions + color_atts + tex_dimensions;
+        
+        glGenVertexArrays(1, &VAO);
+        glBindVertexArray(VAO);
+        glVertexAttribPointer(0, dimensions, GL_FLOAT, GL_FALSE, total * sizeof(float), (void*)0);
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(1, color_atts, GL_FLOAT, GL_FALSE, total * sizeof(float), (void*)(dimensions*sizeof(float)));
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(2, tex_dimensions, GL_FLOAT, GL_FALSE, total * sizeof(float), (void*)((total-tex_dimensions)*sizeof(float)));
+        glEnableVertexAttribArray(2);
     }
