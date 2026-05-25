@@ -72,3 +72,7 @@ void Shader::setUniform(const char name[], const glm::vec4 vec4){
     unsigned int uniform_loc = glGetUniformLocation(shaderProgram, name);
     glUniform4f(uniform_loc, vec4.x, vec4.y, vec4.z, vec4.w);
 }
+void Shader::setUniform(const char name[], const glm::vec3 vec3){
+    unsigned int uniform_loc = glGetUniformLocation(shaderProgram, name);
+    glUniform3f(uniform_loc, vec3.x, vec3.y, vec3.z);
+}

@@ -22,6 +22,9 @@ void create_colored_textued_shape(unsigned int &VAO, unsigned int &VBO, unsigned
     float vert[], unsigned int vert_cnt, unsigned int ind[], 
     unsigned int ind_cnt);
 void processInput(GLFWwindow* window);
+void create_textured_shape(unsigned int &VAO, unsigned int &VBO, unsigned int& EBO, 
+    float vert[], unsigned int vert_cnt, unsigned int ind[], 
+    unsigned int ind_cnt);
 
 namespace shapes {
     float r_tri[] = {
@@ -35,11 +38,25 @@ namespace shapes {
     };
     
     float rect[] = {
+        // position       
+        -0.5,  0.5f, 0.0f,//top-left
+         0.5,  0.5f, 0.0f, //top-right
+         0.5, -0.5f, 0.0f, //bottom-right
+        -0.5, -0.5f, 0.0f, //bottom-left
+    };
+    float rect_c_t[] = {
         // position         color           texture coor
         -0.5,  0.5f, 0.0f,  1.0f, 1.0f, 0.0f,  0.0f, 1.0f,//top-left
          0.5,  0.5f, 0.0f,  1.0f, 0.0f, 0.0f,  1.0f, 1.0f, //top-right
          0.5, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,  1.0f, 0.0f, //bottom-right
         -0.5, -0.5f, 0.0f,  0.0f, 0.0f, 1.0f,  0.0f, 0.0f, //bottom-left
+    };
+    float rect_t[] = {
+        // position           texture coor
+        -0.5,  0.5f, 0.0f,  0.0f, 1.0f,//top-left
+         0.5,  0.5f, 0.0f,  1.0f, 1.0f, //top-right
+         0.5, -0.5f, 0.0f,  1.0f, 0.0f, //bottom-right
+        -0.5, -0.5f, 0.0f,  0.0f, 0.0f, //bottom-left
     };
     
     unsigned int rect_ind[] = {
@@ -102,10 +119,22 @@ int main(int argc, char * argv[]) {
 
 
     Shader shader("Glitter/Shaders/shader.vs", "Glitter/Shaders/shader.fs");
+    Shader shaderTexture("Glitter/Shaders/texture.vs", "Glitter/Shaders/texture.fs");
+    Shader shaderColoredTexture("Glitter/Shaders/disco-texture.vs", "Glitter/Shaders/disco-texture.fs");
     
     unsigned int VBO, VAO, EBO;
+    unsigned int VBO_T, VAO_T, EBO_T;
+    unsigned int VBO_S, VAO_S, EBO_S;
     
-    create_colored_textued_shape(VAO, VBO, EBO, shapes::rect, 8*4, shapes::rect_ind, 6);
+    
+    
+    create_shape(VAO_S, VBO_S, EBO_S, shapes::rect, 4, shapes::rect_ind, 6, 3);
+    
+    shader.use();
+    shader.setUniform("aColor", glm::vec3(1.0f,glm::vec2(0.0f)));
+    
+    create_colored_textued_shape(VAO, VBO, EBO, shapes::rect_c_t, 8*4, shapes::rect_ind, 6);
+    create_textured_shape(VAO_T, VBO_T, EBO_T, shapes::rect_t, 5*4, shapes::rect_ind, 6);
     
     
     // Rendering Loop
@@ -117,7 +146,9 @@ int main(int argc, char * argv[]) {
 
 
         
-        drawTexturedShape(VAO, EBO, shader, 6, texture);
+        drawTexturedShape(VAO_T, EBO_T, shaderTexture, 6, texture);
+        //drawTexturedShape(VAO, EBO, shaderColoredTexture, 6, texture);
+        //drawShape(VAO_S, EBO_S, shader, 6);
 
         // Flip Buffers and Draw
         glfwSwapBuffers(mWindow);
@@ -170,6 +201,32 @@ void create_shape(unsigned int &VAO, unsigned int &VBO, unsigned int& EBO,
         glEnableVertexAttribArray(0);
     }
 
+void create_textured_shape(unsigned int &VAO, unsigned int &VBO, unsigned int& EBO, 
+    float vert[], unsigned int vert_cnt, unsigned int ind[], 
+    unsigned int ind_cnt){
+    
+        
+        
+        glGenBuffers(1, &VBO);
+        glBindBuffer(GL_ARRAY_BUFFER, VBO);
+        glBufferData(GL_ARRAY_BUFFER, vert_cnt*sizeof(float), vert, GL_STATIC_DRAW);
+        
+        glGenBuffers(1,&EBO);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, ind_cnt*sizeof(unsigned int), ind, GL_STATIC_DRAW);
+        
+        unsigned int dimensions = 3;
+        unsigned int tex_dimensions = 2;
+        
+        unsigned int total = dimensions + tex_dimensions;
+        
+        glGenVertexArrays(1, &VAO);
+        glBindVertexArray(VAO);
+        glVertexAttribPointer(0, dimensions, GL_FLOAT, GL_FALSE, total * sizeof(float), (void*)0);
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(1, tex_dimensions, GL_FLOAT, GL_FALSE, total * sizeof(float), (void*)((total-tex_dimensions)*sizeof(float)));
+        glEnableVertexAttribArray(1);
+    }
 void create_colored_textued_shape(unsigned int &VAO, unsigned int &VBO, unsigned int& EBO, 
     float vert[], unsigned int vert_cnt, unsigned int ind[], 
     unsigned int ind_cnt){
