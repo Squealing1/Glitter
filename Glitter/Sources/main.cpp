@@ -1,6 +1,6 @@
 // Local Headers
 #include "glitter.hpp"
-#include "glm/ext/vector_float4.hpp"
+#include <exception>
 #include <shader.hpp>
 
 // System Headers
@@ -12,6 +12,7 @@
 #include <cstdlib>
 #include <stb_image.h>
 #include <iostream>
+#include <stdexcept>
 
 void drawShape(unsigned int &VAO, unsigned int &EBO, Shader shader, unsigned int vert_cnt);
 void drawTexturedShape(unsigned int &VAO, unsigned int &EBO, Shader shader, unsigned int vert_cnt, unsigned int texture);
@@ -25,6 +26,8 @@ void processInput(GLFWwindow* window);
 void create_textured_shape(unsigned int &VAO, unsigned int &VBO, unsigned int& EBO, 
     float vert[], unsigned int vert_cnt, unsigned int ind[], 
     unsigned int ind_cnt);
+void create_texture(unsigned int &texture, const char texture_filepath[], std::string filetype);
+
 
 namespace shapes {
     float r_tri[] = {
@@ -94,32 +97,17 @@ int main(int argc, char * argv[]) {
     fprintf(stderr, "OpenGL %s\n", glGetString(GL_VERSION));
     
 
-    int width, height, nrChannels;
-    unsigned char* data = stbi_load("Glitter/Textures/container.jpg", &width, &height, &nrChannels, 0);
 
     
-    unsigned int texture;
-    glGenTextures(1, &texture);
-    
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    
-    glBindTexture(GL_TEXTURE_2D, texture);
-    
-    if (data){
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
-    }
-    else {
-        std::cout << "Failed to load texture" << std::endl;
-    }
-    stbi_image_free(data);
+    unsigned int texture1;
+    create_texture(texture1, "Glitter/Textures/container.jpg", "jpg");
+    unsigned int texture2;
+    create_texture(texture2, "Glitter/Textures/awesomeface.png", "png");
 
 
     Shader shader("Glitter/Shaders/shader.vs", "Glitter/Shaders/shader.fs");
     Shader shaderTexture("Glitter/Shaders/texture.vs", "Glitter/Shaders/texture.fs");
+    Shader shaderDoubleTexture("Glitter/Shaders/double-texture.vs", "Glitter/Shaders/double-texture.fs");
     Shader shaderColoredTexture("Glitter/Shaders/disco-texture.vs", "Glitter/Shaders/disco-texture.fs");
     
     unsigned int VBO, VAO, EBO;
@@ -128,13 +116,15 @@ int main(int argc, char * argv[]) {
     
     
     
-    create_shape(VAO_S, VBO_S, EBO_S, shapes::rect, 4, shapes::rect_ind, 6, 3);
-    
-    shader.use();
-    shader.setUniform("aColor", glm::vec3(1.0f,glm::vec2(0.0f)));
-    
-    create_colored_textued_shape(VAO, VBO, EBO, shapes::rect_c_t, 8*4, shapes::rect_ind, 6);
     create_textured_shape(VAO_T, VBO_T, EBO_T, shapes::rect_t, 5*4, shapes::rect_ind, 6);
+    
+    
+
+    shaderDoubleTexture.use();
+    shaderDoubleTexture.setUniform("ourTexture1",0);
+    shaderDoubleTexture.setUniform("ourTexture2",1);
+    
+    
     
     
     // Rendering Loop
@@ -146,9 +136,11 @@ int main(int argc, char * argv[]) {
 
 
         
-        drawTexturedShape(VAO_T, EBO_T, shaderTexture, 6, texture);
-        //drawTexturedShape(VAO, EBO, shaderColoredTexture, 6, texture);
-        //drawShape(VAO_S, EBO_S, shader, 6);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, texture1);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, texture2);
+        drawShape(VAO_T, EBO_T, shaderDoubleTexture, 6);
 
         // Flip Buffers and Draw
         glfwSwapBuffers(mWindow);
@@ -256,3 +248,32 @@ void create_colored_textued_shape(unsigned int &VAO, unsigned int &VBO, unsigned
         glVertexAttribPointer(2, tex_dimensions, GL_FLOAT, GL_FALSE, total * sizeof(float), (void*)((total-tex_dimensions)*sizeof(float)));
         glEnableVertexAttribArray(2);
     }
+
+void create_texture(unsigned int &texture, const char texture_filepath[], std::string filetype){
+    int width, height, nrChannels;
+    stbi_set_flip_vertically_on_load(true);
+    unsigned char* data = stbi_load(texture_filepath, &width, &height, &nrChannels, 0);
+    glGenTextures(1, &texture);
+    
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    
+    glBindTexture(GL_TEXTURE_2D, texture);
+    
+    if (data){
+        if(filetype == "jpg")
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+        else if(filetype == "png")
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+        else {
+            throw std::runtime_error("Bad file type: " + filetype);
+        }
+        glGenerateMipmap(GL_TEXTURE_2D);
+    }
+    else {
+        throw std::runtime_error("Failed to load texture: " + std::string(texture_filepath));
+    }
+    stbi_image_free(data);
+}
