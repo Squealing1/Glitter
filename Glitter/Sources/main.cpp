@@ -6,6 +6,7 @@
 #include "glm/ext/vector_float3.hpp"
 #include "glm/trigonometric.hpp"
 #include <exception>
+#include <iterator>
 #include <shader.hpp>
 
 // System Headers
@@ -132,6 +133,19 @@ namespace shapes {
         30, 31, 32,
         33, 34, 35
     };
+    
+glm::vec3 cubePositions[] = {
+    glm::vec3( 0.0f,  0.0f,  0.0f), 
+    glm::vec3( 2.0f,  5.0f, -15.0f), 
+    glm::vec3(-1.5f, -2.2f, -2.5f),  
+    glm::vec3(-3.8f, -2.0f, -12.3f),  
+    glm::vec3( 2.4f, -0.4f, -3.5f),  
+    glm::vec3(-1.7f,  3.0f, -7.5f),  
+    glm::vec3( 1.3f, -2.0f, -2.5f),  
+    glm::vec3( 1.5f,  2.0f, -2.5f), 
+    glm::vec3( 1.5f,  0.2f, -1.5f), 
+    glm::vec3(-1.3f,  1.0f, -1.5f)  
+};
 
 };
 
@@ -191,10 +205,12 @@ int main(int argc, char * argv[]) {
     
     glm::mat4 proj;
     proj = glm::perspective(glm::radians(45.0f), (float)mWidth / (float)mHeight, 0.1f, 100.0f);
+    //float divisor = (float)mWidth/8.0f;
+    //proj = glm::ortho(-(float)mWidth/divisor,(float)mWidth/divisor,-(float)mHeight/divisor,(float)mHeight/divisor,0.1f,100.0f);
 
     glm::mat4 view(1.0f);
     view = glm::translate(view, glm::vec3(0.0f,0.0f,-3.0f));
-    
+
     glm::mat4 model(1.0f);
 
     shaderDoubleTextureMVP.setUniform("projection", proj);
@@ -215,15 +231,17 @@ int main(int argc, char * argv[]) {
         
 
 
-        model = glm::mat4(1.0f);
-        model = glm::rotate(model, glm::radians((float)glfwGetTime()*30), glm::vec3(0.5f, 1.0f, 0.0f));
-        shaderDoubleTextureMVP.setUniform("model",model);
-        view = glm::mat4(1.0f);
-        view = glm::translate(view, glm::vec3(0.0f,0.0f,-glm::abs(glm::sin((float)glfwGetTime())*10)-3.0f));
-        shaderDoubleTextureMVP.setUniform("view",view);
+        for(unsigned int i = 0; i < std::size(shapes::cubePositions); i++){
+            model = glm::mat4(1.0f);
+            model = glm::translate(model, shapes::cubePositions[i]);
+            model = glm::rotate(model, glm::radians(15.0f)*(float)i, glm::vec3(0.4f,0.95f,0.2f));
+            shaderDoubleTextureMVP.setUniform("model",model);
+            drawDoubleTexturedShape(VAO_T, EBO_T, shaderDoubleTextureMVP, 36, texture1, texture2);
+            
+
+        }
         
 
-        drawDoubleTexturedShape(VAO_T, EBO_T, shaderDoubleTextureMVP, 36, texture1, texture2);
 
         // Flip Buffers and Draw
         glfwSwapBuffers(mWindow);
