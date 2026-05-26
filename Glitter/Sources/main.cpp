@@ -21,6 +21,7 @@
 
 void drawShape(unsigned int &VAO, unsigned int &EBO, Shader shader, unsigned int vert_cnt);
 void drawTexturedShape(unsigned int &VAO, unsigned int &EBO, Shader shader, unsigned int vert_cnt, unsigned int texture);
+void drawDoubleTexturedShape(unsigned int &VAO, unsigned int &EBO, Shader shader, unsigned int vert_cnt, unsigned int texture1, unsigned int texture2);
 void create_shape(unsigned int &VAO, unsigned int &VBO, unsigned int& EBO, 
     float vert[], unsigned int vert_cnt, unsigned int ind[], 
     unsigned int ind_cnt, unsigned int dimensions);
@@ -221,12 +222,8 @@ int main(int argc, char * argv[]) {
         view = glm::translate(view, glm::vec3(0.0f,0.0f,-glm::abs(glm::sin((float)glfwGetTime())*10)-3.0f));
         shaderDoubleTextureMVP.setUniform("view",view);
         
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, texture1);
-        glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, texture2);
-        drawShape(VAO_T, EBO_T, shaderDoubleTextureMVP, 36);
 
+        drawDoubleTexturedShape(VAO_T, EBO_T, shaderDoubleTextureMVP, 36, texture1, texture2);
 
         // Flip Buffers and Draw
         glfwSwapBuffers(mWindow);
@@ -239,6 +236,17 @@ int main(int argc, char * argv[]) {
     return EXIT_SUCCESS;
 }
 
+void drawDoubleTexturedShape(unsigned int &VAO, unsigned int &EBO, Shader shader, unsigned int vert_cnt, unsigned int texture1, unsigned int texture2){
+    shader.use();
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, texture1);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, texture2);
+    glBindVertexArray(VAO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glDrawElements(GL_TRIANGLES, vert_cnt, GL_UNSIGNED_INT, 0);
+    glBindVertexArray(0);
+}
 void drawTexturedShape(unsigned int &VAO, unsigned int &EBO, Shader shader, unsigned int vert_cnt, unsigned int texture){
     shader.use();
     glBindTexture(GL_TEXTURE_2D, texture);
