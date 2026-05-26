@@ -20,6 +20,7 @@ class Shader {
         void setUniform(const char name[], const glm::vec4 vec4);
         void setUniform(const char name[], const glm::vec3 vec3);
         void setUniform(const char name[], const unsigned int integer);
+        void setUniform(const char name[], const glm::mat4 mat4);
 
     
     private:

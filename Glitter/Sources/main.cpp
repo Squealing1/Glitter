@@ -1,5 +1,7 @@
 // Local Headers
 #include "glitter.hpp"
+#include "glm/ext/matrix_transform.hpp"
+#include "glm/trigonometric.hpp"
 #include <exception>
 #include <shader.hpp>
 
@@ -109,6 +111,7 @@ int main(int argc, char * argv[]) {
     Shader shaderTexture("Glitter/Shaders/texture.vs", "Glitter/Shaders/texture.fs");
     Shader shaderDoubleTexture("Glitter/Shaders/double-texture.vs", "Glitter/Shaders/double-texture.fs");
     Shader shaderColoredTexture("Glitter/Shaders/disco-texture.vs", "Glitter/Shaders/disco-texture.fs");
+    Shader shaderDoubleTextureTransform("Glitter/Shaders/double-texture-transform.vs", "Glitter/Shaders/double-texture.fs");
     
     unsigned int VBO, VAO, EBO;
     unsigned int VBO_T, VAO_T, EBO_T;
@@ -120,9 +123,10 @@ int main(int argc, char * argv[]) {
     
     
 
-    shaderDoubleTexture.use();
-    shaderDoubleTexture.setUniform("ourTexture1",0);
-    shaderDoubleTexture.setUniform("ourTexture2",1);
+    shaderDoubleTextureTransform.use();
+    shaderDoubleTextureTransform.setUniform("ourTexture1",0);
+    shaderDoubleTextureTransform.setUniform("ourTexture2",1);
+    
     
     
     
@@ -134,13 +138,18 @@ int main(int argc, char * argv[]) {
         glClearColor(0.0f, 0.5f, 0.5f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
+        glm::mat4 trans(1.0f);
+        trans = glm::translate(trans, glm::vec3(0.5f,-0.5f,0.0f));
+        trans = glm::scale(trans, glm::vec3(0.5f,0.5f,1.0f));
+        trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f,0.0f,1.0f));
+        shaderDoubleTextureTransform.setUniform("transform", trans);
 
         
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture1);
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, texture2);
-        drawShape(VAO_T, EBO_T, shaderDoubleTexture, 6);
+        drawShape(VAO_T, EBO_T, shaderDoubleTextureTransform, 6);
 
         // Flip Buffers and Draw
         glfwSwapBuffers(mWindow);
