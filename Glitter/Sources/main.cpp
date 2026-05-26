@@ -3,6 +3,7 @@
 #include "glm/ext/matrix_clip_space.hpp"
 #include "glm/ext/matrix_projection.hpp"
 #include "glm/ext/matrix_transform.hpp"
+#include "glm/ext/vector_float3.hpp"
 #include "glm/trigonometric.hpp"
 #include <exception>
 #include <shader.hpp>
@@ -71,6 +72,65 @@ namespace shapes {
         0, 2, 3,
 
     };
+    
+    float cube[] = {
+    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+     0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+
+    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+     0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+     0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+    -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+
+    -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+    -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+    -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+     0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+     0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+     0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+     0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+
+    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+    -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
+    };
+
+    unsigned int cube_ind[] = {
+        0, 1, 2,
+        3, 4, 5,
+        6, 7, 8,
+        9, 10, 11,
+        12, 13, 14,
+        15, 16, 17,
+        18, 19, 20,
+        21, 22, 23,
+        24, 25, 26,
+        27, 28, 29,
+        30, 31, 32,
+        33, 34, 35
+    };
 
 };
 
@@ -120,7 +180,7 @@ int main(int argc, char * argv[]) {
     
     
     
-    create_textured_shape(VAO_T, VBO_T, EBO_T, shapes::rect_t, 5*4, shapes::rect_ind, 6);
+    create_textured_shape(VAO_T, VBO_T, EBO_T, shapes::cube, 5*36, shapes::cube_ind, 36);
     
     
 
@@ -135,7 +195,6 @@ int main(int argc, char * argv[]) {
     view = glm::translate(view, glm::vec3(0.0f,0.0f,-3.0f));
     
     glm::mat4 model(1.0f);
-    model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 
     shaderDoubleTextureMVP.setUniform("projection", proj);
     shaderDoubleTextureMVP.setUniform("view", view);
@@ -143,6 +202,7 @@ int main(int argc, char * argv[]) {
     
     
     
+    glEnable(GL_DEPTH_TEST);
     
     
     // Rendering Loop
@@ -150,16 +210,22 @@ int main(int argc, char * argv[]) {
 
         // Background Fill Color
         glClearColor(0.0f, 0.5f, 0.5f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
 
 
+        model = glm::mat4(1.0f);
+        model = glm::rotate(model, glm::radians((float)glfwGetTime()*30), glm::vec3(0.5f, 1.0f, 0.0f));
+        shaderDoubleTextureMVP.setUniform("model",model);
+        view = glm::mat4(1.0f);
+        view = glm::translate(view, glm::vec3(0.0f,0.0f,-glm::abs(glm::sin((float)glfwGetTime())*10)-3.0f));
+        shaderDoubleTextureMVP.setUniform("view",view);
         
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture1);
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, texture2);
-        drawShape(VAO_T, EBO_T, shaderDoubleTextureMVP, 6);
+        drawShape(VAO_T, EBO_T, shaderDoubleTextureMVP, 36);
 
 
         // Flip Buffers and Draw
