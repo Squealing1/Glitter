@@ -1,5 +1,7 @@
 // Local Headers
 #include "glitter.hpp"
+#include "glm/ext/matrix_clip_space.hpp"
+#include "glm/ext/matrix_projection.hpp"
 #include "glm/ext/matrix_transform.hpp"
 #include "glm/trigonometric.hpp"
 #include <exception>
@@ -112,10 +114,9 @@ int main(int argc, char * argv[]) {
     Shader shaderDoubleTexture("Glitter/Shaders/double-texture.vs", "Glitter/Shaders/double-texture.fs");
     Shader shaderColoredTexture("Glitter/Shaders/disco-texture.vs", "Glitter/Shaders/disco-texture.fs");
     Shader shaderDoubleTextureTransform("Glitter/Shaders/double-texture-transform.vs", "Glitter/Shaders/double-texture.fs");
+    Shader shaderDoubleTextureMVP("Glitter/Shaders/double-texture-mvp.vs", "Glitter/Shaders/double-texture.fs");
     
-    unsigned int VBO, VAO, EBO;
     unsigned int VBO_T, VAO_T, EBO_T;
-    unsigned int VBO_S, VAO_S, EBO_S;
     
     
     
@@ -123,9 +124,22 @@ int main(int argc, char * argv[]) {
     
     
 
-    shaderDoubleTextureTransform.use();
-    shaderDoubleTextureTransform.setUniform("ourTexture1",0);
-    shaderDoubleTextureTransform.setUniform("ourTexture2",1);
+    shaderDoubleTextureMVP.use();
+    shaderDoubleTextureMVP.setUniform("ourTexture1",0);
+    shaderDoubleTextureMVP.setUniform("ourTexture2",1);
+    
+    glm::mat4 proj;
+    proj = glm::perspective(glm::radians(45.0f), (float)mWidth / (float)mHeight, 0.1f, 100.0f);
+
+    glm::mat4 view(1.0f);
+    view = glm::translate(view, glm::vec3(0.0f,0.0f,-3.0f));
+    
+    glm::mat4 model(1.0f);
+    model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+
+    shaderDoubleTextureMVP.setUniform("projection", proj);
+    shaderDoubleTextureMVP.setUniform("view", view);
+    shaderDoubleTextureMVP.setUniform("model",model);
     
     
     
@@ -138,30 +152,14 @@ int main(int argc, char * argv[]) {
         glClearColor(0.0f, 0.5f, 0.5f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
         
-        float time = glfwGetTime();
 
-        glm::mat4 trans(1.0f);
-        trans = glm::translate(trans, glm::vec3(0.5f,-0.5f,0.0f));
-        trans = glm::scale(trans, glm::vec3(0.5f,0.5f,1.0f));
-        trans = glm::rotate(trans, time, glm::vec3(0.0f,0.0f,1.0f));
-        shaderDoubleTextureTransform.setUniform("transform", trans);
 
         
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture1);
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, texture2);
-        drawShape(VAO_T, EBO_T, shaderDoubleTextureTransform, 6);
-
-        glm::mat4 trans2(1.0f);
-        trans2 = glm::translate(trans2, glm::vec3(-0.5f, 0.5f, 0.0f));
-        trans2 = glm::scale(trans2, glm::vec3(glm::abs(glm::sin(time)),glm::abs(glm::sin(time)),1.0f));
-        shaderDoubleTextureTransform.setUniform("transform", trans2);
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, texture1);
-        glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, texture2);
-        drawShape(VAO_T, EBO_T, shaderDoubleTextureTransform, 6);
+        drawShape(VAO_T, EBO_T, shaderDoubleTextureMVP, 6);
 
 
         // Flip Buffers and Draw
