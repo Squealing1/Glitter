@@ -1,11 +1,8 @@
 // Local Headers
 #include "glitter.hpp"
-#include "glm/ext/matrix_clip_space.hpp"
-#include "glm/ext/matrix_projection.hpp"
 #include "glm/ext/matrix_transform.hpp"
 #include "glm/ext/vector_float3.hpp"
-#include "glm/trigonometric.hpp"
-#include <exception>
+#include "glm/geometric.hpp"
 #include <iterator>
 #include <shader.hpp>
 
@@ -17,7 +14,6 @@
 #include <cstdio>
 #include <cstdlib>
 #include <stb_image.h>
-#include <iostream>
 #include <stdexcept>
 
 void drawShape(unsigned int &VAO, unsigned int &EBO, Shader shader, unsigned int vert_cnt);
@@ -193,6 +189,14 @@ int main(int argc, char * argv[]) {
     
     unsigned int VBO_T, VAO_T, EBO_T;
     
+    glm::vec3 cameraPos(0.0f,0.0f,3.0f);
+    glm::vec3 cameraTarget(0.0f,0.0f,0.0f);
+    
+    glm::vec3 toCameraDirection(cameraPos - cameraTarget);
+    glm::vec3 up(0.0f,1.0f,0.0f);
+    glm::vec3 cameraRight = glm::normalize(glm::cross(up, toCameraDirection));
+    
+    glm::vec3 cameraUp = glm::normalize(glm::cross(toCameraDirection,cameraRight));
     
     
     create_textured_shape(VAO_T, VBO_T, EBO_T, shapes::cube, 5*36, shapes::cube_ind, 36);
@@ -229,6 +233,13 @@ int main(int argc, char * argv[]) {
         glClearColor(0.0f, 0.5f, 0.5f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
+        float time = glfwGetTime();
+        
+        const float radius = 10.0f;
+        float camX = glm::sin(time)*radius;
+        float camZ = glm::cos(time)*radius;
+        view = glm::lookAt(glm::vec3(camX,0.0f,camZ), cameraTarget, cameraUp);
+        shaderDoubleTextureMVP.setUniform("view",view);
 
 
         for(unsigned int i = 0; i < std::size(shapes::cubePositions); i++){
@@ -237,8 +248,6 @@ int main(int argc, char * argv[]) {
             model = glm::rotate(model, glm::radians(15.0f)*(float)i, glm::vec3(0.4f,0.95f,0.2f));
             shaderDoubleTextureMVP.setUniform("model",model);
             drawDoubleTexturedShape(VAO_T, EBO_T, shaderDoubleTextureMVP, 36, texture1, texture2);
-            
-
         }
         
 
