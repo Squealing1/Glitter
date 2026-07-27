@@ -1,6 +1,7 @@
 
 #include <helpers.hpp>
 
+#define SMALL_FLOAT 0.00000001f
 
 namespace shapes {
     float r_tri[] = {
@@ -142,18 +143,24 @@ void drawShape(unsigned int &VAO, unsigned int &EBO, Shader shader, unsigned int
     glBindVertexArray(0);
 }
 
-void processInput(GLFWwindow* mWindow, glm::vec3& cameraPos, glm::vec3 cameraFront, glm::vec3 cameraUp){
-    float speed = 0.5;
+void processInput(GLFWwindow* mWindow, glm::vec3& cameraPos, glm::vec3 cameraFront, glm::vec3 cameraUp, float deltatime){
+    float movementSpeed = 5.5;
+    float cameraSpeed = movementSpeed * deltatime;
+    glm::vec3 velocity(0.0f);
     if (glfwGetKey(mWindow, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(mWindow, true);
     if (glfwGetKey(mWindow, GLFW_KEY_W) == GLFW_PRESS)
-        cameraPos += cameraFront * speed;
+        velocity += cameraFront;
     if (glfwGetKey(mWindow, GLFW_KEY_S) == GLFW_PRESS)
-        cameraPos -= cameraFront * speed;
+        velocity -= cameraFront;
     if (glfwGetKey(mWindow, GLFW_KEY_D) == GLFW_PRESS)
-        cameraPos += glm::normalize(glm::cross(cameraFront,cameraUp)) * speed;
+        velocity += glm::normalize(glm::cross(cameraFront,cameraUp));
     if (glfwGetKey(mWindow, GLFW_KEY_A) == GLFW_PRESS)
-        cameraPos -= glm::normalize(glm::cross(cameraFront,cameraUp)) * speed;
+        velocity -= glm::normalize(glm::cross(cameraFront,cameraUp));
+    
+    if(glm::length(velocity) > SMALL_FLOAT) 
+        velocity = glm::normalize(velocity) * cameraSpeed;
+    cameraPos += velocity;
 }
 
 void create_shape(unsigned int &VAO, unsigned int &VBO, unsigned int& EBO, 

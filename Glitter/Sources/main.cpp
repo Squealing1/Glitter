@@ -97,6 +97,9 @@ int main(int argc, char * argv[]) {
     
     glEnable(GL_DEPTH_TEST);
     
+    float elapsed_time = 0.0f;
+    float lastframe_time = 0.0f;
+    float deltatime = 0.0f;
     
     // Rendering Loop
     while (!glfwWindowShouldClose(mWindow)) {
@@ -105,7 +108,11 @@ int main(int argc, char * argv[]) {
         glClearColor(0.0f, 0.5f, 0.5f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
-        float time = glfwGetTime();
+        elapsed_time = glfwGetTime();
+        deltatime = elapsed_time - lastframe_time;
+        lastframe_time = elapsed_time;
+
+        
 
         view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
         shaderDoubleTextureMVP.setUniform("view",view);
@@ -124,7 +131,7 @@ int main(int argc, char * argv[]) {
         // Flip Buffers and Draw
         glfwSwapBuffers(mWindow);
         glfwPollEvents();
-        processInput(mWindow, cameraPos, cameraFront, cameraUp);
+        processInput(mWindow, cameraPos, cameraFront, cameraUp, deltatime);
         
 
         
