@@ -63,13 +63,14 @@ int main(int argc, char * argv[]) {
     unsigned int VBO_T, VAO_T, EBO_T;
     
     glm::vec3 cameraPos(0.0f,0.0f,3.0f);
+    glm::vec3 cameraUp(0.0f,1.0f,0.0f);
+    glm::vec3 cameraFront(0.0f,0.0f,-1.0f);
     glm::vec3 cameraTarget(0.0f,0.0f,0.0f);
     
     glm::vec3 toCameraDirection(cameraPos - cameraTarget);
     glm::vec3 up(0.0f,1.0f,0.0f);
     glm::vec3 cameraRight = glm::normalize(glm::cross(up, toCameraDirection));
     
-    glm::vec3 cameraUp = glm::normalize(glm::cross(toCameraDirection,cameraRight));
     
     
     create_textured_shape(VAO_T, VBO_T, EBO_T, shapes::cube, 5*36, shapes::cube_ind, 36);
@@ -82,8 +83,6 @@ int main(int argc, char * argv[]) {
     
     glm::mat4 proj;
     proj = glm::perspective(glm::radians(45.0f), (float)mWidth / (float)mHeight, 0.1f, 100.0f);
-    //float divisor = (float)mWidth/8.0f;
-    //proj = glm::ortho(-(float)mWidth/divisor,(float)mWidth/divisor,-(float)mHeight/divisor,(float)mHeight/divisor,0.1f,100.0f);
 
     glm::mat4 view(1.0f);
     view = glm::translate(view, glm::vec3(0.0f,0.0f,-3.0f));
@@ -107,11 +106,8 @@ int main(int argc, char * argv[]) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
         float time = glfwGetTime();
-        
-        const float radius = 10.0f;
-        float camX = glm::sin(time)*radius;
-        float camZ = glm::cos(time)*radius;
-        view = glm::lookAt(glm::vec3(camX,0.0f,camZ), cameraTarget, cameraUp);
+
+        view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
         shaderDoubleTextureMVP.setUniform("view",view);
 
 
@@ -128,7 +124,7 @@ int main(int argc, char * argv[]) {
         // Flip Buffers and Draw
         glfwSwapBuffers(mWindow);
         glfwPollEvents();
-        processInput(mWindow);
+        processInput(mWindow, cameraPos, cameraFront, cameraUp);
         
 
         

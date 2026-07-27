@@ -142,9 +142,18 @@ void drawShape(unsigned int &VAO, unsigned int &EBO, Shader shader, unsigned int
     glBindVertexArray(0);
 }
 
-void processInput(GLFWwindow* mWindow){
+void processInput(GLFWwindow* mWindow, glm::vec3& cameraPos, glm::vec3 cameraFront, glm::vec3 cameraUp){
+    float speed = 0.5;
     if (glfwGetKey(mWindow, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(mWindow, true);
+    if (glfwGetKey(mWindow, GLFW_KEY_W) == GLFW_PRESS)
+        cameraPos += cameraFront * speed;
+    if (glfwGetKey(mWindow, GLFW_KEY_S) == GLFW_PRESS)
+        cameraPos -= cameraFront * speed;
+    if (glfwGetKey(mWindow, GLFW_KEY_D) == GLFW_PRESS)
+        cameraPos += glm::normalize(glm::cross(cameraFront,cameraUp)) * speed;
+    if (glfwGetKey(mWindow, GLFW_KEY_A) == GLFW_PRESS)
+        cameraPos -= glm::normalize(glm::cross(cameraFront,cameraUp)) * speed;
 }
 
 void create_shape(unsigned int &VAO, unsigned int &VBO, unsigned int& EBO, 

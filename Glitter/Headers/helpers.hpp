@@ -27,7 +27,7 @@ void create_shape(unsigned int &VAO, unsigned int &VBO, unsigned int& EBO,
 void create_colored_textued_shape(unsigned int &VAO, unsigned int &VBO, unsigned int& EBO, 
     float vert[], unsigned int vert_cnt, unsigned int ind[], 
     unsigned int ind_cnt);
-void processInput(GLFWwindow* window);
+void processInput(GLFWwindow* mWindow, glm::vec3& cameraPos, glm::vec3 cameraFront, glm::vec3 cameraUp);
 void create_textured_shape(unsigned int &VAO, unsigned int &VBO, unsigned int& EBO, 
     float vert[], unsigned int vert_cnt, unsigned int ind[], 
     unsigned int ind_cnt);
