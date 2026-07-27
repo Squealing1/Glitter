@@ -44,6 +44,8 @@ add_executable(${PROJECT_NAME}
     ${PROJECT_SOURCES}
     ${PROJECT_HEADERS}
     ${PROJECT_SHADERS}
+    Glitter/Headers/helpers.hpp
+    Glitter/Sources/helpers.cpp
     Glitter/Sources/shader.cpp
     Glitter/Headers/shader.hpp
     Glitter/Sources/stb_image.cpp)
