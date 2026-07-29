@@ -10,6 +10,7 @@ float lastX = (float)mWidth/2.0f;
 float lastY = (float)mHeight/2.0f;
 float fov = 30.0f;
 bool first_mouse = true;
+Camera camera(glm::vec3(0.0f,0.0f,3.0f));
 
 namespace shapes {
     const float r_tri[] = {
@@ -155,6 +156,19 @@ void drawShape(unsigned int &VAO, unsigned int &EBO, Shader shader, unsigned int
 void processInput(GLFWwindow* mWindow){
     if (glfwGetKey(mWindow, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(mWindow, true);
+}
+void processInput(GLFWwindow* mWindow, Camera& camera, float deltatime){
+
+    if (glfwGetKey(mWindow, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+        glfwSetWindowShouldClose(mWindow, true);
+    if (glfwGetKey(mWindow, GLFW_KEY_W) == GLFW_PRESS)
+        camera.ProcessKeyboard(FORWARD, deltatime);
+    if (glfwGetKey(mWindow, GLFW_KEY_S) == GLFW_PRESS)
+        camera.ProcessKeyboard(BACKWARD, deltatime);
+    if (glfwGetKey(mWindow, GLFW_KEY_D) == GLFW_PRESS)
+        camera.ProcessKeyboard(RIGHT, deltatime);
+    if (glfwGetKey(mWindow, GLFW_KEY_A) == GLFW_PRESS)
+        camera.ProcessKeyboard(LEFT, deltatime);
 }
 void processInput(GLFWwindow* mWindow, glm::vec3& cameraPos, glm::vec3 cameraFront, glm::vec3 cameraUp, float deltatime){
     float movementSpeed = 5.5;
@@ -397,11 +411,11 @@ int drawCubes(int argc, char * argv[]){
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
 
-        proj = glm::perspective(glm::radians(fov), (float)mWidth / (float)mHeight, 0.1f, 100.0f);
+        proj = glm::perspective(glm::radians(camera.Zoom), (float)mWidth / (float)mHeight, 0.1f, 100.0f);
         shaderDoubleTextureMVP.setUniform("projection",proj);
         
 
-        view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+        view = camera.GetViewMatrix();
         shaderDoubleTextureMVP.setUniform("view",view);
 
 
@@ -418,7 +432,7 @@ int drawCubes(int argc, char * argv[]){
         // Flip Buffers and Draw
         glfwSwapBuffers(mWindow);
         glfwPollEvents();
-        processInput(mWindow, cameraPos, cameraFront, cameraUp, deltaTimer.getDeltaTime());
+        processInput(mWindow, camera, deltaTimer.getDeltaTime());
         
 
         
@@ -447,24 +461,9 @@ void mouse_callback(GLFWwindow* mWindow, double xpos, double ypos){
     lastX = xpos;
     lastY = ypos;
 
-    const float sensitivity = 0.1f;
-    xoffset *= sensitivity;
-    yoffset *= sensitivity;
-    
-    yaw += xoffset;
-    pitch += yoffset;
-    
-    if(pitch > 89.0f) pitch = 89.0f;
-    if(pitch < -89.0f) pitch = -89.0f;
-
-    cameraFront = glm::normalize(cameraDirection(yaw, pitch));
-    
+    camera.ProcessMouseMovement(xoffset, yoffset);
 }
 
 void scroll_callback(GLFWwindow* mWindow, double xoffset, double yoffset){
-    fov -= (float)yoffset;
-    if(fov < 1.0f) fov = 1.0f;
-    if(fov > 45.0f) fov = 45.0f;
-
-    
+    camera.ProcessMouseScroll(static_cast<float>(yoffset));
 }

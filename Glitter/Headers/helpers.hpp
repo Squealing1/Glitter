@@ -7,6 +7,7 @@
 #include "glm/geometric.hpp"
 #include <iterator>
 #include <shader.hpp>
+#include <camera.hpp>
 
 // System Headers
 #include <glad/glad.h>
