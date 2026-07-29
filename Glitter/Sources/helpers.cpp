@@ -4,31 +4,31 @@
 #define SMALL_FLOAT 0.00000001f
 
 namespace shapes {
-    float r_tri[] = {
+    const float r_tri[] = {
        -0.5f, 0.25f, 0.0f,  // top-left
        -0.5f, -0.5f, 0.0f,  // bottom-left
        0.5f, -0.5f, 0.0f,  // bottom-right
     };
     
-    unsigned int r_tri_ind[] = {
+    const unsigned int r_tri_ind[] = {
         0, 1, 2
     };
     
-    float rect[] = {
+    const float rect[] = {
         // position       
         -0.5,  0.5f, 0.0f,//top-left
          0.5,  0.5f, 0.0f, //top-right
          0.5, -0.5f, 0.0f, //bottom-right
         -0.5, -0.5f, 0.0f, //bottom-left
     };
-    float rect_c_t[] = {
+    const float rect_c_t[] = {
         // position         color           texture coor
         -0.5,  0.5f, 0.0f,  1.0f, 1.0f, 0.0f,  0.0f, 1.0f,//top-left
          0.5,  0.5f, 0.0f,  1.0f, 0.0f, 0.0f,  1.0f, 1.0f, //top-right
          0.5, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,  1.0f, 0.0f, //bottom-right
         -0.5, -0.5f, 0.0f,  0.0f, 0.0f, 1.0f,  0.0f, 0.0f, //bottom-left
     };
-    float rect_t[] = {
+    const float rect_t[] = {
         // position           texture coor
         -0.5,  0.5f, 0.0f,  0.0f, 1.0f,//top-left
          0.5,  0.5f, 0.0f,  1.0f, 1.0f, //top-right
@@ -36,13 +36,13 @@ namespace shapes {
         -0.5, -0.5f, 0.0f,  0.0f, 0.0f, //bottom-left
     };
     
-    unsigned int rect_ind[] = {
+    const unsigned int rect_ind[] = {
         0, 1, 2,
         0, 2, 3,
 
     };
     
-    float cube[] = {
+    const float cube[] = {
     -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
      0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
      0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
@@ -86,7 +86,7 @@ namespace shapes {
     -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
     };
 
-    unsigned int cube_ind[] = {
+    const unsigned int cube_ind[] = {
         0, 1, 2,
         3, 4, 5,
         6, 7, 8,
@@ -101,18 +101,18 @@ namespace shapes {
         33, 34, 35
     };
     
-std::vector<glm::vec3> cubePositions = {
-    glm::vec3( 0.0f,  0.0f,  0.0f), 
-    glm::vec3( 2.0f,  5.0f, -15.0f), 
-    glm::vec3(-1.5f, -2.2f, -2.5f),  
-    glm::vec3(-3.8f, -2.0f, -12.3f),  
-    glm::vec3( 2.4f, -0.4f, -3.5f),  
-    glm::vec3(-1.7f,  3.0f, -7.5f),  
-    glm::vec3( 1.3f, -2.0f, -2.5f),  
-    glm::vec3( 1.5f,  2.0f, -2.5f), 
-    glm::vec3( 1.5f,  0.2f, -1.5f), 
-    glm::vec3(-1.3f,  1.0f, -1.5f)  
-};
+    const std::vector<glm::vec3> cubePositions = {
+        glm::vec3( 0.0f,  0.0f,  0.0f), 
+        glm::vec3( 2.0f,  5.0f, -15.0f), 
+        glm::vec3(-1.5f, -2.2f, -2.5f),  
+        glm::vec3(-3.8f, -2.0f, -12.3f),  
+        glm::vec3( 2.4f, -0.4f, -3.5f),  
+        glm::vec3(-1.7f,  3.0f, -7.5f),  
+        glm::vec3( 1.3f, -2.0f, -2.5f),  
+        glm::vec3( 1.5f,  2.0f, -2.5f), 
+        glm::vec3( 1.5f,  0.2f, -1.5f), 
+        glm::vec3(-1.3f,  1.0f, -1.5f)  
+    };
 
 };
 
@@ -127,6 +127,7 @@ void drawDoubleTexturedShape(unsigned int &VAO, unsigned int &EBO, Shader shader
     glDrawElements(GL_TRIANGLES, vert_cnt, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
 }
+
 void drawTexturedShape(unsigned int &VAO, unsigned int &EBO, Shader shader, unsigned int vert_cnt, unsigned int texture){
     shader.use();
     glBindTexture(GL_TEXTURE_2D, texture);
@@ -143,6 +144,10 @@ void drawShape(unsigned int &VAO, unsigned int &EBO, Shader shader, unsigned int
     glBindVertexArray(0);
 }
 
+void processInput(GLFWwindow* mWindow){
+    if (glfwGetKey(mWindow, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+        glfwSetWindowShouldClose(mWindow, true);
+}
 void processInput(GLFWwindow* mWindow, glm::vec3& cameraPos, glm::vec3 cameraFront, glm::vec3 cameraUp, float deltatime){
     float movementSpeed = 5.5;
     float cameraSpeed = movementSpeed * deltatime;
@@ -182,8 +187,20 @@ void create_shape(unsigned int &VAO, unsigned int &VBO, unsigned int& EBO,
         glEnableVertexAttribArray(0);
     }
 
+GLFWwindow* loadGLFWCreateWindow(int width, int height){
+    // Load GLFW and Create a Window
+    glfwInit();
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+    glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
+    auto mWindow = glfwCreateWindow(width, height, "OpenGL", nullptr, nullptr);
+    return mWindow;
+}
+
 void create_textured_shape(unsigned int &VAO, unsigned int &VBO, unsigned int& EBO, 
-    float vert[], unsigned int vert_cnt, unsigned int ind[], 
+    const float vert[], unsigned int vert_cnt, unsigned int const ind[], 
     unsigned int ind_cnt){
     
         
@@ -266,3 +283,221 @@ void create_texture(unsigned int &texture, const char texture_filepath[], std::s
     }
     stbi_image_free(data);
 }
+
+GLFWwindow* initOpenGL(int& return_status, int width, int height){
+    // Load GLFW and Create a Window
+    auto mWindow = loadGLFWCreateWindow(width, height);
+
+    // Check for Valid Context
+    if (mWindow == nullptr) {
+        fprintf(stderr, "Failed to Create OpenGL Context");
+        return_status = EXIT_FAILURE;
+        return mWindow;
+    }
+
+    // Create Context and Load OpenGL Functions
+    glfwMakeContextCurrent(mWindow);
+    gladLoadGL();
+    fprintf(stderr, "OpenGL %s\n", glGetString(GL_VERSION));
+    
+
+    glEnable(GL_DEPTH_TEST);
+    return_status = EXIT_SUCCESS;
+    return mWindow;
+}
+
+DeltaTimer::DeltaTimer(){}
+float DeltaTimer::getDeltaTime(bool do_update){
+    if(do_update) 
+        updateDeltaTime();
+    return deltatime;
+}
+void DeltaTimer::updateDeltaTime(){
+    elapsed_time = glfwGetTime();
+    deltatime = elapsed_time - lastframe_time;
+    lastframe_time = elapsed_time;
+}
+
+// learnopgl start
+
+int drawCubes(int argc, char * argv[]){
+    
+    // Initialize OpenGL
+    int return_status = EXIT_SUCCESS;
+    auto mWindow = initOpenGL(return_status, mWidth, mHeight);
+    if(return_status != EXIT_SUCCESS) return return_status;
+    
+    DeltaTimer deltaTimer{};
+    
+
+    
+    unsigned int texture1;
+    create_texture(texture1, "Glitter/Textures/container.jpg", "jpg");
+    unsigned int texture2;
+    create_texture(texture2, "Glitter/Textures/awesomeface.png", "png");
+
+
+    Shader shaderDoubleTextureMVP("Glitter/Shaders/double-texture-mvp.vs", "Glitter/Shaders/double-texture.fs");
+    
+    unsigned int VBO_T, VAO_T, EBO_T;
+    
+    
+    
+    
+    create_textured_shape(VAO_T, VBO_T, EBO_T, shapes::cube, 5*36, shapes::cube_ind, 36);
+    
+    
+
+    shaderDoubleTextureMVP.use();
+    shaderDoubleTextureMVP.setUniform("ourTexture1",0);
+    shaderDoubleTextureMVP.setUniform("ourTexture2",1);
+    
+    glm::mat4 proj;
+    proj = glm::perspective(glm::radians(45.0f), (float)mWidth / (float)mHeight, 0.1f, 100.0f);
+
+    glm::mat4 view(1.0f);
+    view = glm::translate(view, glm::vec3(0.0f,0.0f,-3.0f));
+
+    glm::mat4 model(1.0f);
+
+    shaderDoubleTextureMVP.setUniform("projection", proj);
+    shaderDoubleTextureMVP.setUniform("view", view);
+    shaderDoubleTextureMVP.setUniform("model",model);
+    
+    
+    glm::vec3 cameraPos(0.0f,0.0f,3.0f);
+    glm::vec3 cameraUp(0.0f,1.0f,0.0f);
+    glm::vec3 cameraFront(0.0f,0.0f,-1.0f);
+    glm::vec3 cameraTarget(0.0f,0.0f,0.0f);
+    
+    glm::vec3 toCameraDirection(cameraPos - cameraTarget);
+    glm::vec3 up(0.0f,1.0f,0.0f);
+    glm::vec3 cameraRight = glm::normalize(glm::cross(up, toCameraDirection));
+    
+    
+    
+    // Rendering Loop
+    while (!glfwWindowShouldClose(mWindow)) {
+
+        // Background Fill Color
+        glClearColor(0.0f, 0.5f, 0.5f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        
+
+        
+
+        view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+        shaderDoubleTextureMVP.setUniform("view",view);
+
+
+        for(unsigned int i = 0; i < std::size(shapes::cubePositions); i++){
+            model = glm::mat4(1.0f);
+            model = glm::translate(model, shapes::cubePositions[i]);
+            model = glm::rotate(model, glm::radians(15.0f)*(float)i, glm::vec3(0.4f,0.95f,0.2f));
+            shaderDoubleTextureMVP.setUniform("model",model);
+            drawDoubleTexturedShape(VAO_T, EBO_T, shaderDoubleTextureMVP, 36, texture1, texture2);
+        }
+        
+
+
+        // Flip Buffers and Draw
+        glfwSwapBuffers(mWindow);
+        glfwPollEvents();
+        processInput(mWindow, cameraPos, cameraFront, cameraUp, deltaTimer.getDeltaTime());
+        
+
+        
+    }   glfwTerminate();
+    return EXIT_SUCCESS;
+}
+
+int drawOther(int argc, char * argv[]){
+    int return_status = EXIT_SUCCESS;
+    auto mWindow = initOpenGL(return_status, mWidth, mHeight);
+    if(return_status != EXIT_SUCCESS) return return_status;
+    
+    DeltaTimer deltaTimer{};
+    
+
+    
+    unsigned int texture1;
+    create_texture(texture1, "Glitter/Textures/container.jpg", "jpg");
+    unsigned int texture2;
+    create_texture(texture2, "Glitter/Textures/awesomeface.png", "png");
+
+
+    Shader shaderDoubleTextureMVP("Glitter/Shaders/double-texture-mvp.vs", "Glitter/Shaders/double-texture.fs");
+    
+    unsigned int VBO_T, VAO_T, EBO_T;
+    
+    
+    
+    
+    create_textured_shape(VAO_T, VBO_T, EBO_T, shapes::cube, 5*36, shapes::cube_ind, 36);
+    
+    
+
+    shaderDoubleTextureMVP.use();
+    shaderDoubleTextureMVP.setUniform("ourTexture1",0);
+    shaderDoubleTextureMVP.setUniform("ourTexture2",1);
+    
+    glm::mat4 proj;
+    proj = glm::perspective(glm::radians(45.0f), (float)mWidth / (float)mHeight, 0.1f, 100.0f);
+
+    glm::mat4 view(1.0f);
+    view = glm::translate(view, glm::vec3(0.0f,0.0f,-3.0f));
+
+    glm::mat4 model(1.0f);
+
+    shaderDoubleTextureMVP.setUniform("projection", proj);
+    shaderDoubleTextureMVP.setUniform("view", view);
+    shaderDoubleTextureMVP.setUniform("model",model);
+    
+    
+    glm::vec3 cameraPos(0.0f,0.0f,3.0f);
+    glm::vec3 cameraUp(0.0f,1.0f,0.0f);
+    glm::vec3 cameraFront(0.0f,0.0f,-1.0f);
+    glm::vec3 cameraTarget(0.0f,0.0f,0.0f);
+    
+    glm::vec3 toCameraDirection(cameraPos - cameraTarget);
+    glm::vec3 up(0.0f,1.0f,0.0f);
+    glm::vec3 cameraRight = glm::normalize(glm::cross(up, toCameraDirection));
+    
+    
+    
+    // Rendering Loop
+    while (!glfwWindowShouldClose(mWindow)) {
+
+        // Background Fill Color
+        glClearColor(0.0f, 0.5f, 0.5f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        
+
+        
+
+        view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+        shaderDoubleTextureMVP.setUniform("view",view);
+
+
+        for(unsigned int i = 0; i < std::size(shapes::cubePositions); i++){
+            model = glm::mat4(1.0f);
+            model = glm::translate(model, shapes::cubePositions[i]);
+            model = glm::rotate(model, glm::radians(15.0f)*(float)i, glm::vec3(0.4f,0.95f,0.2f));
+            shaderDoubleTextureMVP.setUniform("model",model);
+            drawDoubleTexturedShape(VAO_T, EBO_T, shaderDoubleTextureMVP, 36, texture1, texture2);
+        }
+        
+
+
+        // Flip Buffers and Draw
+        glfwSwapBuffers(mWindow);
+        glfwPollEvents();
+        processInput(mWindow);
+        
+
+        
+    }   glfwTerminate();
+    return EXIT_SUCCESS;
+}
+
+// learnopgl end
