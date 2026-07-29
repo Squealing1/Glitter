@@ -37,6 +37,13 @@ GLFWwindow* loadGLFWCreateWindow(int width, int height);
 GLFWwindow* initOpenGL(int& return_status, int width, int height);
 int drawCubes(int argc, char * argv[]);
 int drawOther(int argc, char * argv[]);
+void mouse_callback(GLFWwindow* mWindow, double xPos, double yPos);
+
+extern float yaw;
+extern float pitch;
+extern float lastX;
+extern float lastY;
+extern bool first_mouse;
 
 namespace shapes {
     extern const float r_tri[];
@@ -60,5 +67,6 @@ class DeltaTimer{
         float lastframe_time = 0.0f;
         float deltatime = 0.0f;
 };
+glm::vec3 cameraDirection(float yaw, float pitch);
 
 #endif

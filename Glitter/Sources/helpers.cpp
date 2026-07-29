@@ -3,6 +3,13 @@
 
 #define SMALL_FLOAT 0.00000001f
 
+glm::vec3 cameraFront(0.0f,0.0f,-1.0f);
+float yaw = -90.0f;
+float pitch = 0.0f;
+float lastX = (float)mWidth/2.0f;
+float lastY = (float)mHeight/2.0f;
+bool first_mouse = true;
+
 namespace shapes {
     const float r_tri[] = {
        -0.5f, 0.25f, 0.0f,  // top-left
@@ -367,13 +374,17 @@ int drawCubes(int argc, char * argv[]){
     
     glm::vec3 cameraPos(0.0f,0.0f,3.0f);
     glm::vec3 cameraUp(0.0f,1.0f,0.0f);
-    glm::vec3 cameraFront(0.0f,0.0f,-1.0f);
     glm::vec3 cameraTarget(0.0f,0.0f,0.0f);
     
     glm::vec3 toCameraDirection(cameraPos - cameraTarget);
     glm::vec3 up(0.0f,1.0f,0.0f);
     glm::vec3 cameraRight = glm::normalize(glm::cross(up, toCameraDirection));
     
+    
+    glfwSetInputMode(mWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetCursorPosCallback(mWindow, mouse_callback);
+
+
     
     
     // Rendering Loop
@@ -411,93 +422,37 @@ int drawCubes(int argc, char * argv[]){
     return EXIT_SUCCESS;
 }
 
-int drawOther(int argc, char * argv[]){
-    int return_status = EXIT_SUCCESS;
-    auto mWindow = initOpenGL(return_status, mWidth, mHeight);
-    if(return_status != EXIT_SUCCESS) return return_status;
-    
-    DeltaTimer deltaTimer{};
-    
-
-    
-    unsigned int texture1;
-    create_texture(texture1, "Glitter/Textures/container.jpg", "jpg");
-    unsigned int texture2;
-    create_texture(texture2, "Glitter/Textures/awesomeface.png", "png");
-
-
-    Shader shaderDoubleTextureMVP("Glitter/Shaders/double-texture-mvp.vs", "Glitter/Shaders/double-texture.fs");
-    
-    unsigned int VBO_T, VAO_T, EBO_T;
-    
-    
-    
-    
-    create_textured_shape(VAO_T, VBO_T, EBO_T, shapes::cube, 5*36, shapes::cube_ind, 36);
-    
-    
-
-    shaderDoubleTextureMVP.use();
-    shaderDoubleTextureMVP.setUniform("ourTexture1",0);
-    shaderDoubleTextureMVP.setUniform("ourTexture2",1);
-    
-    glm::mat4 proj;
-    proj = glm::perspective(glm::radians(45.0f), (float)mWidth / (float)mHeight, 0.1f, 100.0f);
-
-    glm::mat4 view(1.0f);
-    view = glm::translate(view, glm::vec3(0.0f,0.0f,-3.0f));
-
-    glm::mat4 model(1.0f);
-
-    shaderDoubleTextureMVP.setUniform("projection", proj);
-    shaderDoubleTextureMVP.setUniform("view", view);
-    shaderDoubleTextureMVP.setUniform("model",model);
-    
-    
-    glm::vec3 cameraPos(0.0f,0.0f,3.0f);
-    glm::vec3 cameraUp(0.0f,1.0f,0.0f);
-    glm::vec3 cameraFront(0.0f,0.0f,-1.0f);
-    glm::vec3 cameraTarget(0.0f,0.0f,0.0f);
-    
-    glm::vec3 toCameraDirection(cameraPos - cameraTarget);
-    glm::vec3 up(0.0f,1.0f,0.0f);
-    glm::vec3 cameraRight = glm::normalize(glm::cross(up, toCameraDirection));
-    
-    
-    
-    // Rendering Loop
-    while (!glfwWindowShouldClose(mWindow)) {
-
-        // Background Fill Color
-        glClearColor(0.0f, 0.5f, 0.5f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        
-
-        
-
-        view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
-        shaderDoubleTextureMVP.setUniform("view",view);
-
-
-        for(unsigned int i = 0; i < std::size(shapes::cubePositions); i++){
-            model = glm::mat4(1.0f);
-            model = glm::translate(model, shapes::cubePositions[i]);
-            model = glm::rotate(model, glm::radians(15.0f)*(float)i, glm::vec3(0.4f,0.95f,0.2f));
-            shaderDoubleTextureMVP.setUniform("model",model);
-            drawDoubleTexturedShape(VAO_T, EBO_T, shaderDoubleTextureMVP, 36, texture1, texture2);
-        }
-        
-
-
-        // Flip Buffers and Draw
-        glfwSwapBuffers(mWindow);
-        glfwPollEvents();
-        processInput(mWindow);
-        
-
-        
-    }   glfwTerminate();
-    return EXIT_SUCCESS;
-}
 
 // learnopgl end
+
+glm::vec3 cameraDirection(float yaw, float pitch){
+    glm::vec3 direction;
+    direction.x = glm::cos(glm::radians(yaw)) * glm::cos(glm::radians(pitch));
+    direction.y = glm::sin(glm::radians(pitch));
+    direction.z = glm::sin(glm::radians(yaw)) * glm::cos(glm::radians(pitch));
+    return direction;
+}
+void mouse_callback(GLFWwindow* mWindow, double xpos, double ypos){
+    if(first_mouse){
+        lastX = xpos;
+        lastY = ypos;
+        first_mouse = false;
+    }
+    float xoffset = xpos - lastX;
+    float yoffset = lastY - ypos;
+    lastX = xpos;
+    lastY = ypos;
+
+    const float sensitivity = 0.1f;
+    xoffset *= sensitivity;
+    yoffset *= sensitivity;
+    
+    yaw += xoffset;
+    pitch += yoffset;
+    
+    if(pitch > 89.0f) pitch = 89.0f;
+    if(pitch < -89.0f) pitch = -89.0f;
+
+    cameraFront = glm::normalize(cameraDirection(yaw, pitch));
+    
+}
