@@ -8,6 +8,7 @@ float yaw = -90.0f;
 float pitch = 0.0f;
 float lastX = (float)mWidth/2.0f;
 float lastY = (float)mHeight/2.0f;
+float fov = 30.0f;
 bool first_mouse = true;
 
 namespace shapes {
@@ -383,6 +384,7 @@ int drawCubes(int argc, char * argv[]){
     
     glfwSetInputMode(mWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     glfwSetCursorPosCallback(mWindow, mouse_callback);
+    glfwSetScrollCallback(mWindow, scroll_callback);
 
 
     
@@ -395,6 +397,8 @@ int drawCubes(int argc, char * argv[]){
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
 
+        proj = glm::perspective(glm::radians(fov), (float)mWidth / (float)mHeight, 0.1f, 100.0f);
+        shaderDoubleTextureMVP.setUniform("projection",proj);
         
 
         view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
@@ -454,5 +458,13 @@ void mouse_callback(GLFWwindow* mWindow, double xpos, double ypos){
     if(pitch < -89.0f) pitch = -89.0f;
 
     cameraFront = glm::normalize(cameraDirection(yaw, pitch));
+    
+}
+
+void scroll_callback(GLFWwindow* mWindow, double xoffset, double yoffset){
+    fov -= (float)yoffset;
+    if(fov < 1.0f) fov = 1.0f;
+    if(fov > 45.0f) fov = 45.0f;
+
     
 }

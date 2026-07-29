@@ -39,6 +39,7 @@ int drawCubes(int argc, char * argv[]);
 int drawOther(int argc, char * argv[]);
 void mouse_callback(GLFWwindow* mWindow, double xPos, double yPos);
 
+void scroll_callback(GLFWwindow* mWindow, double xoffset, double yoffset);
 extern float yaw;
 extern float pitch;
 extern float lastX;
