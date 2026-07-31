@@ -19,12 +19,13 @@
 #include <stb_image.h>
 #include <stdexcept>
 
+int drawLight(int argc, char * argv[]);
+void create_shape(unsigned int &VAO, unsigned int &VBO, unsigned int& EBO, 
+    const float vert[], unsigned int vert_cnt, const unsigned int ind[], 
+    unsigned int ind_cnt);
 void drawShape(unsigned int &VAO, unsigned int &EBO, Shader shader, unsigned int vert_cnt);
 void drawTexturedShape(unsigned int &VAO, unsigned int &EBO, Shader shader, unsigned int vert_cnt, unsigned int texture);
 void drawDoubleTexturedShape(unsigned int &VAO, unsigned int &EBO, Shader shader, unsigned int vert_cnt, unsigned int texture1, unsigned int texture2);
-void create_shape(unsigned int &VAO, unsigned int &VBO, unsigned int& EBO, 
-    float vert[], unsigned int vert_cnt, unsigned int ind[], 
-    unsigned int ind_cnt, unsigned int dimensions);
 void create_colored_textued_shape(unsigned int &VAO, unsigned int &VBO, unsigned int& EBO, 
     float vert[], unsigned int vert_cnt, unsigned int ind[], 
     unsigned int ind_cnt);
@@ -54,7 +55,7 @@ namespace shapes {
     extern const float rect_c_t[];
     extern const float rect_t[];
     extern const unsigned int rect_ind[];
-    extern const float cube[];
+    extern const float textured_cube[];
     extern const unsigned int cube_ind[];
     extern const std::vector<glm::vec3> cubePositions;
 };

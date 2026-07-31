@@ -21,5 +21,5 @@
 
 
 int main(int argc, char * argv[]) {
-    drawCubes(argc, argv);
+    drawLight(argc, argv);
 }

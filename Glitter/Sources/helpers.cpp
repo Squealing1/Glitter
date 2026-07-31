@@ -52,6 +52,49 @@ namespace shapes {
     };
     
     const float cube[] = {
+    -0.5f, -0.5f, -0.5f,
+     0.5f, -0.5f, -0.5f,
+     0.5f,  0.5f, -0.5f,
+     0.5f,  0.5f, -0.5f,
+    -0.5f,  0.5f, -0.5f,
+    -0.5f, -0.5f, -0.5f,
+
+    -0.5f, -0.5f,  0.5f,
+     0.5f, -0.5f,  0.5f,
+     0.5f,  0.5f,  0.5f,
+     0.5f,  0.5f,  0.5f,
+    -0.5f,  0.5f,  0.5f,
+    -0.5f, -0.5f,  0.5f,
+
+    -0.5f,  0.5f,  0.5f,
+    -0.5f,  0.5f, -0.5f,
+    -0.5f, -0.5f, -0.5f,
+    -0.5f, -0.5f, -0.5f,
+    -0.5f, -0.5f,  0.5f,
+    -0.5f,  0.5f,  0.5f,
+
+     0.5f,  0.5f,  0.5f,
+     0.5f,  0.5f, -0.5f,
+     0.5f, -0.5f, -0.5f,
+     0.5f, -0.5f, -0.5f,
+     0.5f, -0.5f,  0.5f,
+     0.5f,  0.5f,  0.5f,
+
+    -0.5f, -0.5f, -0.5f,
+     0.5f, -0.5f, -0.5f,
+     0.5f, -0.5f,  0.5f,
+     0.5f, -0.5f,  0.5f,
+    -0.5f, -0.5f,  0.5f,
+    -0.5f, -0.5f, -0.5f,
+
+    -0.5f,  0.5f, -0.5f,
+     0.5f,  0.5f, -0.5f,
+     0.5f,  0.5f,  0.5f,
+     0.5f,  0.5f,  0.5f,
+    -0.5f,  0.5f,  0.5f,
+    -0.5f,  0.5f, -0.5f,
+    };
+    const float textured_cube[] = {
     -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
      0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
      0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
@@ -191,8 +234,8 @@ void processInput(GLFWwindow* mWindow, glm::vec3& cameraPos, glm::vec3 cameraFro
 }
 
 void create_shape(unsigned int &VAO, unsigned int &VBO, unsigned int& EBO, 
-    float vert[], unsigned int vert_cnt, unsigned int ind[], 
-    unsigned int ind_cnt, unsigned int dimensions){
+    const float vert[], unsigned int vert_cnt, const unsigned int ind[], 
+    unsigned int ind_cnt){
         
         glGenBuffers(1, &VBO);
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
@@ -201,6 +244,8 @@ void create_shape(unsigned int &VAO, unsigned int &VBO, unsigned int& EBO,
         glGenBuffers(1,&EBO);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, ind_cnt*sizeof(unsigned int), ind, GL_STATIC_DRAW);
+        
+        unsigned int dimensions = 3;
         
         
         glGenVertexArrays(1, &VAO);
@@ -366,7 +411,7 @@ int drawCubes(int argc, char * argv[]){
     
     
     
-    create_textured_shape(VAO_T, VBO_T, EBO_T, shapes::cube, 5*36, shapes::cube_ind, 36);
+    create_textured_shape(VAO_T, VBO_T, EBO_T, shapes::textured_cube, 5*36, shapes::cube_ind, 36);
     
     
 
@@ -466,4 +511,101 @@ void mouse_callback(GLFWwindow* mWindow, double xpos, double ypos){
 
 void scroll_callback(GLFWwindow* mWindow, double xoffset, double yoffset){
     camera.ProcessMouseScroll(static_cast<float>(yoffset));
+}
+
+int drawLight(int argc, char * argv[]){
+    
+    // Initialize OpenGL
+    int return_status = EXIT_SUCCESS;
+    auto mWindow = initOpenGL(return_status, mWidth, mHeight);
+    if(return_status != EXIT_SUCCESS) return return_status;
+    
+    DeltaTimer deltaTimer{};
+    
+
+    
+
+
+    
+    unsigned int VBO_O, VAO_O, EBO_O;
+    unsigned int VBO_T, VAO_T, EBO_T;
+    
+    
+    
+    
+    create_shape(VAO_T, VBO_T, EBO_T, shapes::cube, 3*36, shapes::cube_ind, 36);
+    create_shape(VAO_O, VBO_O, EBO_O, shapes::cube, 3*36, shapes::cube_ind, 36);
+    
+    
+
+    
+    glm::mat4 proj;
+    proj = glm::perspective(glm::radians(45.0f), (float)mWidth / (float)mHeight, 0.1f, 100.0f);
+
+    glm::mat4 view(1.0f);
+    view = glm::translate(view, glm::vec3(0.0f,0.0f,-3.0f));
+
+    glm::mat4 model(1.0f);
+
+    Shader object_shader("Glitter/Shaders/light.vs", "Glitter/Shaders/light.fs");
+    Shader light_shader("Glitter/Shaders/light.vs", "Glitter/Shaders/shader.fs");
+    object_shader.use();
+    object_shader.setUniform("projection", proj);
+    object_shader.setUniform("view", view);
+    object_shader.setUniform("model",model);
+    object_shader.setUniform("light_color", glm::vec3(1.0f,1.0f,1.0f));
+    object_shader.setUniform("object_color", glm::vec3(1.0f,0.5f,0.31f));
+    
+    light_shader.use();
+    
+    glm::vec3 light_pos(1.2f,1.0f,2.0f);
+    model = glm::translate(model, light_pos);
+    model = glm::scale(model, glm::vec3(0.2f));
+    light_shader.setUniform("projection", proj);
+    light_shader.setUniform("view", view);
+    light_shader.setUniform("model",model);
+    light_shader.setUniform("aColor",glm::vec3(1.0f,1.0f,1.0f));
+    
+    
+    
+    
+    glfwSetInputMode(mWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetCursorPosCallback(mWindow, mouse_callback);
+    glfwSetScrollCallback(mWindow, scroll_callback);
+
+
+    
+    
+    // Rendering Loop
+    while (!glfwWindowShouldClose(mWindow)) {
+
+        // Background Fill Color
+        glClearColor(0.05f, 0.05f, 0.05f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        
+
+        proj = glm::perspective(glm::radians(camera.Zoom), (float)mWidth / (float)mHeight, 0.1f, 100.0f);
+        
+
+        view = camera.GetViewMatrix();
+        light_shader.use();
+        light_shader.setUniform("projection",proj);
+        light_shader.setUniform("view",view);
+        object_shader.use();
+        object_shader.setUniform("view",view);
+        object_shader.setUniform("projection",proj);
+        
+        drawShape(VAO_T, EBO_T, light_shader, 3*36);
+        drawShape(VAO_O, VAO_O, object_shader, 3*36);
+
+
+        // Flip Buffers and Draw
+        glfwSwapBuffers(mWindow);
+        glfwPollEvents();
+        processInput(mWindow, camera, deltaTimer.getDeltaTime());
+        
+
+        
+    }   glfwTerminate();
+    return EXIT_SUCCESS;
 }
