@@ -663,13 +663,16 @@ int drawLight(int argc, char * argv[]){
         
 
         view = camera.GetViewMatrix();
+
         light_shader.use();
         light_shader.setUniform("projection",proj);
         light_shader.setUniform("view",view);
+
         object_shader.use();
         object_shader.setUniform("view",view);
         object_shader.setUniform("projection",proj);
-        
+        object_shader.setUniform("view_pos", camera.Position);
+
         drawShape(VAO_T, EBO_O, light_shader, 36);
         drawShape(VAO_O, EBO_O, object_shader, 36);
 
