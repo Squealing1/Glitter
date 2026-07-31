@@ -41,6 +41,9 @@ int drawCubes(int argc, char * argv[]);
 int drawOther(int argc, char * argv[]);
 void mouse_callback(GLFWwindow* mWindow, double xPos, double yPos);
 
+void create_lamp_and_light_object(unsigned int &VAO_O, unsigned int &VAO_T,unsigned int &VBO, unsigned int& EBO, 
+    const float vert[], unsigned int vert_cnt, const unsigned int ind[], 
+    unsigned int ind_cnt);
 void scroll_callback(GLFWwindow* mWindow, double xoffset, double yoffset);
 extern float yaw;
 extern float pitch;

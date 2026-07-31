@@ -94,6 +94,49 @@ namespace shapes {
     -0.5f,  0.5f,  0.5f,
     -0.5f,  0.5f, -0.5f,
     };
+float normal_cube[] = {
+    -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+     0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 
+     0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 
+     0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 
+    -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 
+    -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 
+
+    -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+     0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+     0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+     0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+    -0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+    -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+
+    -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+    -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+    -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+    -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+    -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+    -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+
+     0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+     0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+     0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+     0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+     0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+     0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+
+    -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+     0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+     0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+     0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+    -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+    -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+
+    -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
+     0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
+     0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+     0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+    -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+    -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
+};
     const float textured_cube[] = {
     -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
      0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
@@ -232,6 +275,37 @@ void processInput(GLFWwindow* mWindow, glm::vec3& cameraPos, glm::vec3 cameraFro
         velocity = glm::normalize(velocity) * cameraSpeed;
     cameraPos += velocity;
 }
+void create_lamp_and_light_object(unsigned int &VAO_O, unsigned int &VAO_T,unsigned int &VBO, unsigned int& EBO, 
+    const float vert[], unsigned int vert_cnt, const unsigned int ind[], 
+    unsigned int ind_cnt){
+        
+        glGenBuffers(1, &VBO);
+        glBindBuffer(GL_ARRAY_BUFFER, VBO);
+        glBufferData(GL_ARRAY_BUFFER, vert_cnt*sizeof(float), vert, GL_STATIC_DRAW);
+        
+        glGenBuffers(1,&EBO);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, ind_cnt*sizeof(unsigned int), ind, GL_STATIC_DRAW);
+        
+        unsigned int dimensions = 3;
+        unsigned int normals = 3;
+        unsigned int total = dimensions + normals;
+        
+        
+        // Light
+        glGenVertexArrays(1, &VAO_T);
+        glBindVertexArray(VAO_T);
+        glVertexAttribPointer(0, dimensions, GL_FLOAT, GL_FALSE, total * sizeof(float), (void*)0);
+        glEnableVertexAttribArray(0);
+
+        // Object
+        glGenVertexArrays(1, &VAO_O);
+        glBindVertexArray(VAO_O);
+        glVertexAttribPointer(0, dimensions, GL_FLOAT, GL_FALSE, total * sizeof(float), (void*)0);
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(1, normals, GL_FLOAT, GL_FALSE, total * sizeof(float), (void*) + (dimensions * sizeof(float)));
+        glEnableVertexAttribArray(1);
+    }
 
 void create_shape(unsigned int &VAO, unsigned int &VBO, unsigned int& EBO, 
     const float vert[], unsigned int vert_cnt, const unsigned int ind[], 
@@ -528,13 +602,12 @@ int drawLight(int argc, char * argv[]){
 
     
     unsigned int VBO_O, VAO_O, EBO_O;
-    unsigned int VBO_T, VAO_T, EBO_T;
+    unsigned int VAO_T;
     
     
+    create_lamp_and_light_object(VAO_O, VAO_T, VBO_O, EBO_O, shapes::normal_cube, 6*36, shapes::cube_ind, 36);
     
     
-    create_shape(VAO_T, VBO_T, EBO_T, shapes::cube, 3*36, shapes::cube_ind, 36);
-    create_shape(VAO_O, VBO_O, EBO_O, shapes::cube, 3*36, shapes::cube_ind, 36);
     
     
 
@@ -546,19 +619,21 @@ int drawLight(int argc, char * argv[]){
     view = glm::translate(view, glm::vec3(0.0f,0.0f,-3.0f));
 
     glm::mat4 model(1.0f);
+    glm::vec3 light_pos(1.2f,1.0f,2.0f);
 
-    Shader object_shader("Glitter/Shaders/light.vs", "Glitter/Shaders/light.fs");
-    Shader light_shader("Glitter/Shaders/light.vs", "Glitter/Shaders/shader.fs");
+    Shader object_shader("Glitter/Shaders/light-object.vs", "Glitter/Shaders/light-object.fs");
+    Shader light_shader("Glitter/Shaders/lamp.vs", "Glitter/Shaders/lamp.fs");
     object_shader.use();
     object_shader.setUniform("projection", proj);
     object_shader.setUniform("view", view);
     object_shader.setUniform("model",model);
     object_shader.setUniform("light_color", glm::vec3(1.0f,1.0f,1.0f));
     object_shader.setUniform("object_color", glm::vec3(1.0f,0.5f,0.31f));
+    object_shader.setUniform("light_pos", light_pos);
+
     
     light_shader.use();
     
-    glm::vec3 light_pos(1.2f,1.0f,2.0f);
     model = glm::translate(model, light_pos);
     model = glm::scale(model, glm::vec3(0.2f));
     light_shader.setUniform("projection", proj);
@@ -595,8 +670,8 @@ int drawLight(int argc, char * argv[]){
         object_shader.setUniform("view",view);
         object_shader.setUniform("projection",proj);
         
-        drawShape(VAO_T, EBO_T, light_shader, 3*36);
-        drawShape(VAO_O, VAO_O, object_shader, 3*36);
+        drawShape(VAO_T, EBO_O, light_shader, 36);
+        drawShape(VAO_O, EBO_O, object_shader, 36);
 
 
         // Flip Buffers and Draw
