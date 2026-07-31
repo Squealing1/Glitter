@@ -255,6 +255,10 @@ void processInput(GLFWwindow* mWindow, Camera& camera, float deltatime){
         camera.ProcessKeyboard(RIGHT, deltatime);
     if (glfwGetKey(mWindow, GLFW_KEY_A) == GLFW_PRESS)
         camera.ProcessKeyboard(LEFT, deltatime);
+    if (glfwGetKey(mWindow, GLFW_KEY_SPACE) == GLFW_PRESS)
+        camera.ProcessKeyboard(UP, deltatime);
+    if (glfwGetKey(mWindow, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+        camera.ProcessKeyboard(DOWN, deltatime);
 }
 void processInput(GLFWwindow* mWindow, glm::vec3& cameraPos, glm::vec3 cameraFront, glm::vec3 cameraUp, float deltatime){
     float movementSpeed = 5.5;
