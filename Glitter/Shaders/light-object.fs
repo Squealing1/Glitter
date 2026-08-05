@@ -7,20 +7,21 @@ uniform vec3 light_pos;
 uniform vec3 light_color;
 uniform vec3 object_color;
 uniform vec3 view_pos;
+uniform mat4 view;
 
 void main(){
     float ambient_strength = 0.1f;
     vec3 ambient = ambient_strength * light_color;
     
     vec3 norm = normalize(Normal);
-    vec3 light_dir = normalize(light_pos - FragPos);
+    vec3 light_dir = normalize(vec3(view*vec4(light_pos,1.0)) - FragPos);
     
     float diffuse_strength = 1.0f;
     float diff = max(dot(norm,light_dir), 0.0f);
     vec3 diffuse = diffuse_strength * diff * light_color;
     
     float specular_strength = 0.5f;
-    vec3 view_dir = normalize(view_pos - FragPos);
+    vec3 view_dir = normalize(-FragPos);
     vec3 reflect_dir = normalize(reflect(-light_dir,norm));
     
     float spec = pow(max(dot(view_dir,reflect_dir), 0.0), 32);
