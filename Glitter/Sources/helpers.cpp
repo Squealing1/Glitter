@@ -12,6 +12,13 @@ float fov = 30.0f;
 bool first_mouse = true;
 Camera camera(glm::vec3(1.0f,1.3f,3.0f), glm::vec3(0.0f,1.0f,0.0f), -100, -20);
 
+struct Material {
+    glm::vec3 ambient;
+    glm::vec3 diffuse;
+    glm::vec3 specular;
+    float shininess;
+};
+
 
 void drawDoubleTexturedShape(unsigned int &VAO, unsigned int &EBO, Shader shader, unsigned int vert_cnt, unsigned int texture1, unsigned int texture2){
     shader.use();
@@ -298,8 +305,8 @@ int mainCubes(int argc, char * argv[]){
     
 
     shaderDoubleTextureMVP.use();
-    shaderDoubleTextureMVP.setUniform("ourTexture1",0);
-    shaderDoubleTextureMVP.setUniform("ourTexture2",1);
+    shaderDoubleTextureMVP.setUniform("ourTexture1",(unsigned int)0);
+    shaderDoubleTextureMVP.setUniform("ourTexture2",(unsigned int)1);
     
     glm::mat4 proj;
     proj = glm::perspective(glm::radians(45.0f), (float)mWidth / (float)mHeight, 0.1f, 100.0f);
@@ -435,10 +442,22 @@ int mainLight(int argc, char * argv[]){
     object_shader.setUniform("projection", proj);
     object_shader.setUniform("view", view);
     object_shader.setUniform("model",model);
-    object_shader.setUniform("light_color", glm::vec3(1.0f,1.0f,1.0f));
-    object_shader.setUniform("object_color", glm::vec3(1.0f,0.5f,0.31f));
-    object_shader.setUniform("light_pos", light_pos);
+    
+    Material material;
+    material.ambient    = glm::vec3(1.0f, 0.5f, 0.31f);
+    material.diffuse    = glm::vec3(1.0f, 0.5f, 0.31f);
+    material.specular   = glm::vec3(0.5f, 0.5f, 0.5f);
+    material.shininess  = 32.0f; 
 
+   object_shader.setUniform("material.ambient",   material.ambient);
+   object_shader.setUniform("material.diffuse",   material.diffuse);
+   object_shader.setUniform("material.specular",  material.specular);
+   object_shader.setUniform("material.shininess", material.shininess); 
+   object_shader.setUniform("light.position", light_pos);
+
+    object_shader.setUniform("light.ambient",  glm::vec3(0.2f, 0.2f, 0.2f));
+    object_shader.setUniform("light.diffuse",  glm::vec3(0.5f, 0.5f, 0.5f)); // darken diffuse light a bit
+    object_shader.setUniform("light.specular", glm::vec3(1.0f, 1.0f, 1.0f)); 
     
     light_shader.use();
     
