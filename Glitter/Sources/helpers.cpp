@@ -490,6 +490,16 @@ int mainLight(int argc, char * argv[]){
         
 
         view = camera.GetViewMatrix();
+        
+        glm::vec3 light_color;
+        light_color.x = glm::sin(glfwGetTime()*2.7);
+        light_color.y = glm::sin(glfwGetTime()*1.0);
+        light_color.z = glm::sin(glfwGetTime()*0.5);
+        
+        object_shader.use();
+        object_shader.setUniform("light.ambient",  light_color * glm::vec3(0.2f, 0.2f, 0.2f));
+        object_shader.setUniform("light.diffuse",  light_color * glm::vec3(0.5f, 0.5f, 0.5f)); // darken diffuse light a bit
+        
 
         light_shader.use();
         light_shader.setUniform("projection",proj);
