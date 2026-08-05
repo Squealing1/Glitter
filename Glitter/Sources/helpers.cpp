@@ -425,7 +425,8 @@ int mainLight(int argc, char * argv[]){
     view = glm::translate(view, glm::vec3(0.0f,0.0f,-3.0f));
 
     glm::mat4 model(1.0f);
-    glm::vec3 light_pos(1.2f,1.0f,2.0f);
+    glm::vec3 light_pos;
+    light_pos = glm::vec3(1.2f,1.0f,2.0f);
 
     Shader object_shader("Glitter/Shaders/light-object.vs", "Glitter/Shaders/light-object.fs");
     Shader light_shader("Glitter/Shaders/lamp.vs", "Glitter/Shaders/lamp.fs");
@@ -440,11 +441,13 @@ int mainLight(int argc, char * argv[]){
     
     light_shader.use();
     
-    model = glm::translate(model, light_pos);
-    model = glm::scale(model, glm::vec3(0.2f));
+    glm::mat4 light_model;
+    light_model = glm::mat4(1.0f);
+    light_model = glm::translate(light_model, light_pos);
+    light_model = glm::scale(light_model, glm::vec3(0.2f));
     light_shader.setUniform("projection", proj);
     light_shader.setUniform("view", view);
-    light_shader.setUniform("model",model);
+    light_shader.setUniform("model",light_model);
     light_shader.setUniform("aColor",glm::vec3(1.0f,1.0f,1.0f));
     
     
@@ -470,14 +473,21 @@ int mainLight(int argc, char * argv[]){
 
         view = camera.GetViewMatrix();
 
+        light_pos = glm::vec3(cos(deltaTimer.getElapsedTime()),sin(deltaTimer.getElapsedTime()),2.0f);
+        light_model = glm::mat4(1.0f);
+        light_model = glm::translate(light_model, light_pos);
+        light_model = glm::scale(light_model, glm::vec3(0.2f));
+
         light_shader.use();
         light_shader.setUniform("projection",proj);
         light_shader.setUniform("view",view);
+        light_shader.setUniform("model",light_model);
 
         object_shader.use();
         object_shader.setUniform("view",view);
         object_shader.setUniform("projection",proj);
         object_shader.setUniform("view_pos", camera.Position);
+        object_shader.setUniform("light_pos", light_pos);
 
         drawShape(VAO_T, EBO_O, light_shader, 36);
         drawShape(VAO_O, EBO_O, object_shader, 36);

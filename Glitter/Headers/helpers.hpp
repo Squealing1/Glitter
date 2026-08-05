@@ -73,6 +73,7 @@ class DeltaTimer{
     public:
         DeltaTimer();
         float getDeltaTime(bool do_update = true);
+        float getElapsedTime() { return elapsed_time; }
     private:
         void updateDeltaTime();
         float elapsed_time = 0.0f;
