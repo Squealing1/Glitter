@@ -504,6 +504,7 @@ int mainLight(int argc, char * argv[]){
         light_shader.use();
         light_shader.setUniform("projection",proj);
         light_shader.setUniform("view",view);
+        light_shader.setUniform("aColor",light_color);
 
         object_shader.use();
         object_shader.setUniform("view",view);
