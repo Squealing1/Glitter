@@ -253,7 +253,9 @@ GLFWwindow* initOpenGL(int& return_status, int width, int height){
     return mWindow;
 }
 
-DeltaTimer::DeltaTimer(){}
+DeltaTimer::DeltaTimer(){
+    updateDeltaTime();
+}
 float DeltaTimer::getDeltaTime(bool do_update){
     if(do_update) 
         updateDeltaTime();
