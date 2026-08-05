@@ -444,10 +444,10 @@ int mainLight(int argc, char * argv[]){
     object_shader.setUniform("model",model);
     
     Material material;
-    material.ambient    = glm::vec3(1.0f, 0.5f, 0.31f);
-    material.diffuse    = glm::vec3(1.0f, 0.5f, 0.31f);
-    material.specular   = glm::vec3(0.5f, 0.5f, 0.5f);
-    material.shininess  = 32.0f; 
+    material.ambient    = glm::vec3(0.0f, 0.1f, 0.06f);
+    material.diffuse    = glm::vec3(0.0f, 0.50980392f, 0.50980392f);
+    material.specular   = glm::vec3(0.50196078f, 0.50196078f, 0.50196078f);
+    material.shininess  = 128.0f*0.25; 
 
    object_shader.setUniform("material.ambient",   material.ambient);
    object_shader.setUniform("material.diffuse",   material.diffuse);
@@ -455,9 +455,9 @@ int mainLight(int argc, char * argv[]){
    object_shader.setUniform("material.shininess", material.shininess); 
    object_shader.setUniform("light.position", light_pos);
 
-    object_shader.setUniform("light.ambient",  glm::vec3(0.2f, 0.2f, 0.2f));
-    object_shader.setUniform("light.diffuse",  glm::vec3(0.5f, 0.5f, 0.5f)); // darken diffuse light a bit
-    object_shader.setUniform("light.specular", glm::vec3(1.0f, 1.0f, 1.0f)); 
+    object_shader.setUniform("light.ambient",  glm::vec3(1.0f));
+    object_shader.setUniform("light.diffuse",  glm::vec3(1.0f)); // darken diffuse light a bit
+    object_shader.setUniform("light.specular", glm::vec3(1.0f)); 
     
     light_shader.use();
     
@@ -491,20 +491,13 @@ int mainLight(int argc, char * argv[]){
 
         view = camera.GetViewMatrix();
         
-        glm::vec3 light_color;
-        light_color.x = glm::sin(glfwGetTime()*2.7);
-        light_color.y = glm::sin(glfwGetTime()*1.0);
-        light_color.z = glm::sin(glfwGetTime()*0.5);
         
         object_shader.use();
-        object_shader.setUniform("light.ambient",  light_color * glm::vec3(0.2f, 0.2f, 0.2f));
-        object_shader.setUniform("light.diffuse",  light_color * glm::vec3(0.5f, 0.5f, 0.5f)); // darken diffuse light a bit
         
 
         light_shader.use();
         light_shader.setUniform("projection",proj);
         light_shader.setUniform("view",view);
-        light_shader.setUniform("aColor",light_color);
 
         object_shader.use();
         object_shader.setUniform("view",view);
