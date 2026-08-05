@@ -10,7 +10,7 @@ float lastX = (float)mWidth/2.0f;
 float lastY = (float)mHeight/2.0f;
 float fov = 30.0f;
 bool first_mouse = true;
-Camera camera(glm::vec3(0.0f,0.0f,3.0f));
+Camera camera(glm::vec3(1.0f,1.3f,3.0f), glm::vec3(0.0f,1.0f,0.0f), -100, -20);
 
 
 void drawDoubleTexturedShape(unsigned int &VAO, unsigned int &EBO, Shader shader, unsigned int vert_cnt, unsigned int texture1, unsigned int texture2){
