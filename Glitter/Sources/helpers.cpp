@@ -506,7 +506,6 @@ int mainLight(int argc, char * argv[]){
         view = camera.GetViewMatrix();
         
         
-        object_shader.use();
         
 
         light_shader.use();
@@ -518,8 +517,17 @@ int mainLight(int argc, char * argv[]){
         object_shader.setUniform("projection",proj);
         object_shader.setUniform("view_pos", camera.Position);
 
+        for(unsigned int i = 0; i < std::size(shapes::cubePositions); i++){
+            model = glm::mat4(1.0f);
+            model = glm::translate(model, shapes::cubePositions[i]);
+            model = glm::rotate(model, glm::radians(15.0f)*(float)i, glm::vec3(0.4f,0.95f,0.2f));
+            object_shader.setUniform("model", model);
+            drawTexturedShape(VAO_O, EBO_O, object_shader, 36, diffuse_sampler_2d);
+        }
+        
+        
+
         drawShape(VAO_T, EBO_O, light_shader, 36);
-        drawTexturedShape(VAO_O, EBO_O, object_shader, 36, diffuse_sampler_2d);
 
 
         // Flip Buffers and Draw
