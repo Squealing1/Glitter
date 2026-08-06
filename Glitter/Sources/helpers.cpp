@@ -467,7 +467,7 @@ int mainLight(int argc, char * argv[]){
    object_shader.setUniform("material.diffuse",   material.diffuse);
    object_shader.setUniform("material.specular",  material.specular);
    object_shader.setUniform("material.shininess", material.shininess); 
-   object_shader.setUniform("light.position", light_pos);
+   object_shader.setUniform("light.direction", glm::vec3(1.0f));
 
     object_shader.setUniform("light.ambient",  glm::vec3(0.1f));
     object_shader.setUniform("light.diffuse",  glm::vec3(1.0f)); // darken diffuse light a bit
@@ -480,7 +480,7 @@ int mainLight(int argc, char * argv[]){
     light_shader.setUniform("projection", proj);
     light_shader.setUniform("view", view);
     light_shader.setUniform("model",model);
-    light_shader.setUniform("aColor",glm::vec3(1.0f,1.0f,1.0f));
+    light_shader.setUniform("aColor",glm::vec3(0.0f,1.0f,0.0f));
     
     
     
