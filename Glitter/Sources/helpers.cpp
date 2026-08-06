@@ -34,6 +34,7 @@ void drawDoubleTexturedShape(unsigned int &VAO, unsigned int &EBO, Shader shader
 
 void drawTexturedShape(unsigned int &VAO, unsigned int &EBO, Shader shader, unsigned int vert_cnt, unsigned int texture){
     shader.use();
+    glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture);
     glBindVertexArray(VAO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
@@ -94,7 +95,7 @@ void create_lamp_and_light_object(unsigned int &VAO_O, unsigned int &VAO_T,unsig
         
         glGenBuffers(1, &VBO);
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
-        glBufferData(GL_ARRAY_BUFFER, vert_cnt*sizeof(float), vert, GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, 8*ind_cnt*sizeof(float), vert, GL_STATIC_DRAW);
         
         glGenBuffers(1,&EBO);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
@@ -102,7 +103,8 @@ void create_lamp_and_light_object(unsigned int &VAO_O, unsigned int &VAO_T,unsig
         
         unsigned int dimensions = 3;
         unsigned int normals = 3;
-        unsigned int total = dimensions + normals;
+        unsigned int texs = 2;
+        unsigned int total = dimensions + normals + texs;
         
         
         // Light
@@ -118,6 +120,10 @@ void create_lamp_and_light_object(unsigned int &VAO_O, unsigned int &VAO_T,unsig
         glEnableVertexAttribArray(0);
         glVertexAttribPointer(1, normals, GL_FLOAT, GL_FALSE, total * sizeof(float), (void*) + (dimensions * sizeof(float)));
         glEnableVertexAttribArray(1);
+
+        // Texture
+        glVertexAttribPointer(2, texs, GL_FLOAT, GL_FALSE, total * sizeof(float), (void*) + ((dimensions + normals) * sizeof(float)));
+        glEnableVertexAttribArray(2);
     }
 
 void create_shape(unsigned int &VAO, unsigned int &VBO, unsigned int& EBO, 
@@ -418,9 +424,12 @@ int mainLight(int argc, char * argv[]){
     
     unsigned int VBO_O, VAO_O, EBO_O;
     unsigned int VAO_T;
+    unsigned int texture;
+    create_texture(texture, "Glitter/Textures/container2.png", "png");
+
+
     
-    
-    create_lamp_and_light_object(VAO_O, VAO_T, VBO_O, EBO_O, shapes::normal_cube, 6*36, shapes::cube_ind, 36);
+    create_lamp_and_light_object(VAO_O, VAO_T, VBO_O, EBO_O, shapes::normal_textured_cube, 8*36, shapes::cube_ind, 36);
     
     
     
@@ -444,18 +453,15 @@ int mainLight(int argc, char * argv[]){
     object_shader.setUniform("model",model);
     
     Material material;
-    material.ambient    = glm::vec3(0.0f, 0.1f, 0.06f);
-    material.diffuse    = glm::vec3(0.0f, 0.50980392f, 0.50980392f);
     material.specular   = glm::vec3(0.50196078f, 0.50196078f, 0.50196078f);
     material.shininess  = 128.0f*0.25; 
 
-   object_shader.setUniform("material.ambient",   material.ambient);
-   object_shader.setUniform("material.diffuse",   material.diffuse);
+   object_shader.setUniform("material.diffuse",   (unsigned int) 0);
    object_shader.setUniform("material.specular",  material.specular);
    object_shader.setUniform("material.shininess", material.shininess); 
    object_shader.setUniform("light.position", light_pos);
 
-    object_shader.setUniform("light.ambient",  glm::vec3(1.0f));
+    object_shader.setUniform("light.ambient",  glm::vec3(0.1f));
     object_shader.setUniform("light.diffuse",  glm::vec3(1.0f)); // darken diffuse light a bit
     object_shader.setUniform("light.specular", glm::vec3(1.0f)); 
     
@@ -505,7 +511,7 @@ int mainLight(int argc, char * argv[]){
         object_shader.setUniform("view_pos", camera.Position);
 
         drawShape(VAO_T, EBO_O, light_shader, 36);
-        drawShape(VAO_O, EBO_O, object_shader, 36);
+        drawTexturedShape(VAO_O, EBO_O, object_shader, 36, texture);
 
 
         // Flip Buffers and Draw
