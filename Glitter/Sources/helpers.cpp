@@ -15,6 +15,7 @@ Camera camera(glm::vec3(1.0f,1.3f,3.0f), glm::vec3(0.0f,1.0f,0.0f), -100, -20);
 struct Material {
     unsigned int diffuse;
     unsigned int specular;
+    unsigned int emission;
     float shininess;
 };
 
@@ -425,14 +426,18 @@ int mainLight(int argc, char * argv[]){
     unsigned int VAO_T;
     unsigned int diffuse_sampler_2d;
     unsigned int specular_sampler_2d;
+    unsigned int emission_sampler_2d;
     create_texture(diffuse_sampler_2d, "Glitter/Textures/container2.png", "png");
     create_texture(diffuse_sampler_2d, "Glitter/Textures/container2.png", "png");
     create_texture(specular_sampler_2d, "Glitter/Textures/container2_specular.png", "png");
+    create_texture(emission_sampler_2d, "Glitter/Textures/matrix.jpg", "jpg");
     
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, diffuse_sampler_2d);
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, specular_sampler_2d);
+    glActiveTexture(GL_TEXTURE2);
+    glBindTexture(GL_TEXTURE_2D, emission_sampler_2d);
 
 
     
@@ -462,11 +467,13 @@ int mainLight(int argc, char * argv[]){
     Material material;
     material.diffuse = 0;
     material.specular = 1;
+    material.emission = 2;
     material.shininess  = 128.0f*0.25; 
 
    object_shader.setUniform("material.diffuse",   material.diffuse);
    object_shader.setUniform("material.specular",  material.specular);
    object_shader.setUniform("material.shininess", material.shininess); 
+   object_shader.setUniform("material.emission", material.emission);
    object_shader.setUniform("light.position", light_pos);
 
     object_shader.setUniform("light.ambient",  glm::vec3(0.1f));
