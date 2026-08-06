@@ -10,7 +10,6 @@ namespace shapes {
     extern const float textured_cube[];
     extern const float normal_cube[];
     extern const float cube[];
-    extern const float normal_textured_cube[];
     extern const unsigned int cube_ind[];
     extern const std::vector<glm::vec3> cubePositions;
 };
