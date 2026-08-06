@@ -8,7 +8,7 @@ uniform vec3 view_pos;
 
 struct Material {
     sampler2D diffuse;
-    sampler2D specular;
+    vec3 specular;
     float shininess;
 };
 
@@ -37,7 +37,7 @@ void main(){
     vec3 reflect_dir = normalize(reflect(-light_dir,norm));
     
     float spec = pow(max(dot(view_dir,reflect_dir), 0.0f), material.shininess);
-    vec3 specular = light.specular * (spec * vec3(texture(material.specular, TexCoords)));
+    vec3 specular = light.specular * (spec * material.specular );
     
 
     
