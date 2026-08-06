@@ -424,8 +424,16 @@ int mainLight(int argc, char * argv[]){
     
     unsigned int VBO_O, VAO_O, EBO_O;
     unsigned int VAO_T;
-    unsigned int texture;
-    create_texture(texture, "Glitter/Textures/container2.png", "png");
+    unsigned int diffuse_sampler_2d;
+    unsigned int specular_sampler_2d;
+    create_texture(diffuse_sampler_2d, "Glitter/Textures/container2.png", "png");
+    create_texture(diffuse_sampler_2d, "Glitter/Textures/container2.png", "png");
+    create_texture(specular_sampler_2d, "Glitter/Textures/container2_specular.png", "png");
+    
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, diffuse_sampler_2d);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, specular_sampler_2d);
 
 
     
@@ -453,11 +461,10 @@ int mainLight(int argc, char * argv[]){
     object_shader.setUniform("model",model);
     
     Material material;
-    material.specular   = glm::vec3(0.50196078f, 0.50196078f, 0.50196078f);
     material.shininess  = 128.0f*0.25; 
 
    object_shader.setUniform("material.diffuse",   (unsigned int) 0);
-   object_shader.setUniform("material.specular",  material.specular);
+   object_shader.setUniform("material.specular",  (unsigned int) 1);
    object_shader.setUniform("material.shininess", material.shininess); 
    object_shader.setUniform("light.position", light_pos);
 
@@ -511,7 +518,7 @@ int mainLight(int argc, char * argv[]){
         object_shader.setUniform("view_pos", camera.Position);
 
         drawShape(VAO_T, EBO_O, light_shader, 36);
-        drawTexturedShape(VAO_O, EBO_O, object_shader, 36, texture);
+        drawTexturedShape(VAO_O, EBO_O, object_shader, 36, diffuse_sampler_2d);
 
 
         // Flip Buffers and Draw
