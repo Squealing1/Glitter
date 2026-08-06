@@ -13,9 +13,8 @@ bool first_mouse = true;
 Camera camera(glm::vec3(1.0f,1.3f,3.0f), glm::vec3(0.0f,1.0f,0.0f), -100, -20);
 
 struct Material {
-    glm::vec3 ambient;
-    glm::vec3 diffuse;
-    glm::vec3 specular;
+    unsigned int diffuse;
+    unsigned int specular;
     float shininess;
 };
 
@@ -461,10 +460,12 @@ int mainLight(int argc, char * argv[]){
     object_shader.setUniform("model",model);
     
     Material material;
+    material.diffuse = 0;
+    material.specular = 1;
     material.shininess  = 128.0f*0.25; 
 
-   object_shader.setUniform("material.diffuse",   (unsigned int) 0);
-   object_shader.setUniform("material.specular",  (unsigned int) 1);
+   object_shader.setUniform("material.diffuse",   material.diffuse);
+   object_shader.setUniform("material.specular",  material.specular);
    object_shader.setUniform("material.shininess", material.shininess); 
    object_shader.setUniform("light.position", light_pos);
 
