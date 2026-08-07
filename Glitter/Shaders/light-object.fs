@@ -17,39 +17,38 @@ uniform Material material;
 
 struct Light {
     vec3 position;
+    vec3 direction;
+    float cut_off;
     vec3 ambient;
     vec3 diffuse;
     vec3 specular;
-    
-    float constant;
-    float linear;
-    float quadratic;
 };
 
 uniform Light light;
 
 void main(){
+    vec3 result;
     vec3 ambient = light.ambient * vec3(texture(material.diffuse, TexCoords));
     
     vec3 norm = normalize(Normal);
     vec3 light_dir = normalize(light.position - FragPos);
     
-    float diff = max(dot(norm,light_dir), 0.0f);
-    vec3 diffuse = light.diffuse * (diff * vec3(texture(material.diffuse, TexCoords)));
+    float theta = dot(light.direction, normalize(-light_dir));
+    
+    if (theta > light.cut_off){
+        float diff = max(dot(norm,light_dir), 0.0f);
+        vec3 diffuse = light.diffuse * (diff * vec3(texture(material.diffuse, TexCoords)));
 
-    vec3 view_dir = normalize(view_pos - FragPos);
-    vec3 reflect_dir = normalize(reflect(-light_dir,norm));
+        vec3 view_dir = normalize(view_pos - FragPos);
+        vec3 reflect_dir = normalize(reflect(-light_dir,norm));
+        
+        float spec = pow(max(dot(view_dir,reflect_dir), 0.0f), material.shininess);
+        vec3 specular = light.specular * (spec * vec3(texture(material.specular, TexCoords)));
+        result = ambient + diffuse + specular;
+    }
+    else {
+        result = ambient;
+    }
     
-    float spec = pow(max(dot(view_dir,reflect_dir), 0.0f), material.shininess);
-    vec3 specular = light.specular * (spec * vec3(texture(material.specular, TexCoords)));
-    
-    float dist = length(FragPos - light.position);
-    float attenuation = 1.0f/(light.constant + light.linear*dist + light.quadratic*pow(dist,2));
-    ambient *= attenuation;
-    diffuse *= attenuation;
-    specular *= attenuation;
-
-    
-    vec3 result = ambient + diffuse + specular;
     FragColor = vec4(result, 1.0f);
 }
