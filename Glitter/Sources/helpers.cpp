@@ -467,7 +467,10 @@ int mainLight(int argc, char * argv[]){
    object_shader.setUniform("material.diffuse",   material.diffuse);
    object_shader.setUniform("material.specular",  material.specular);
    object_shader.setUniform("material.shininess", material.shininess); 
-   object_shader.setUniform("light.direction", glm::vec3(1.0f));
+   object_shader.setUniform("light.position", light_pos);
+   object_shader.setUniform("light.constant", 1.0f);
+   object_shader.setUniform("light.linear", .09f);
+   object_shader.setUniform("light.quadratic", .032f);
 
     object_shader.setUniform("light.ambient",  glm::vec3(0.1f));
     object_shader.setUniform("light.diffuse",  glm::vec3(1.0f)); // darken diffuse light a bit
