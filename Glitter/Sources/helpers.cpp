@@ -468,6 +468,7 @@ int mainLight(int argc, char * argv[]){
    object_shader.setUniform("material.specular",  material.specular);
    object_shader.setUniform("material.shininess", material.shininess); 
    object_shader.setUniform("light.cut_off", glm::cos(glm::radians(14.5f)));
+   object_shader.setUniform("light.outer_cut_off", glm::cos(glm::radians(20.0f)));
 
 
     object_shader.setUniform("light.ambient",  glm::vec3(0.1f));
