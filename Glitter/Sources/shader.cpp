@@ -16,9 +16,9 @@ std::string readfile(const char filepath[]){
     return s;
 }
 
-Shader::Shader(const char vertex_shader_filepath[], const char fragment_shader_filepath[]){
-    std::string vertex_shader_source = readfile(vertex_shader_filepath);
-    std::string fragment_shader_source = readfile(fragment_shader_filepath);
+Shader::Shader(std::string vertex_shader_filepath, std::string fragment_shader_filepath): vertex_shader_filepath(vertex_shader_filepath), fragment_shader_filepath(fragment_shader_filepath){
+    std::string vertex_shader_source = readfile(vertex_shader_filepath.c_str());
+    std::string fragment_shader_source = readfile(fragment_shader_filepath.c_str());
     compileShader(vertex_shader_source.c_str(), fragment_shader_source.c_str());
 }
 
@@ -36,7 +36,7 @@ void Shader::compileShader(const char vertex_shader_source[], const char fragmen
     
     if (!success){
         glGetShaderInfoLog(vertex_shader, 512, NULL, infoLog);
-        std::cout << "ERROR: " << infoLog << std::endl;
+        std::cout << "ERROR: " << vertex_shader_filepath << ": " << infoLog << std::endl;
     }
 
     unsigned int fragment_shader;
@@ -49,7 +49,7 @@ void Shader::compileShader(const char vertex_shader_source[], const char fragmen
     
     if (!success){
         glGetShaderInfoLog(fragment_shader, 512, NULL, infoLog);
-        std::cout << "ERROR: " << infoLog << std::endl;
+        std::cout << "ERROR: " << fragment_shader_filepath << ": " << infoLog << std::endl;
     }
     
     this->shaderProgram = glCreateProgram();
@@ -62,7 +62,7 @@ void Shader::compileShader(const char vertex_shader_source[], const char fragmen
     glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
     if (!success){
         glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-        std::cout << "ERROR: " << infoLog << std::endl;
+        std::cout << "ERROR: " << fragment_shader_filepath << ": " << infoLog << std::endl;
     }
     
     glDeleteShader(vertex_shader);

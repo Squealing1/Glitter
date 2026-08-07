@@ -15,7 +15,7 @@
 
 class Shader {
     public:
-        Shader(const char vertex_shader_filepath[], const char fragment_shader_filepath[]);
+        Shader(std::string vertex_shader_filepath, std::string fragment_shader_filepath) ;
         void use() { glUseProgram(shaderProgram); }
         void setUniform(const char name[], const glm::vec4 vec4);
         void setUniform(const char name[], const glm::vec3 vec3);
@@ -28,6 +28,8 @@ class Shader {
     private:
         unsigned int shaderProgram;
         void compileShader(const char vertex_shader_source[], const char fragment_shader_source[]);
+        std::string vertex_shader_filepath;
+        std::string fragment_shader_filepath;
 
 
 };

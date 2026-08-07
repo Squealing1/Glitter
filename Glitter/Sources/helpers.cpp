@@ -467,14 +467,18 @@ int mainLight(int argc, char * argv[]){
    object_shader.setUniform("material.diffuse",   material.diffuse);
    object_shader.setUniform("material.specular",  material.specular);
    object_shader.setUniform("material.shininess", material.shininess); 
-   object_shader.setUniform("light.cut_off", glm::cos(glm::radians(14.5f)));
-   object_shader.setUniform("light.outer_cut_off", glm::cos(glm::radians(20.0f)));
+   object_shader.setUniform("spot_light.cut_off", glm::cos(glm::radians(14.5f)));
+   object_shader.setUniform("spot_light.outer_cut_off", glm::cos(glm::radians(20.0f)));
 
 
-    object_shader.setUniform("light.ambient",  glm::vec3(0.1f));
-    object_shader.setUniform("light.diffuse",  glm::vec3(1.0f)); // darken diffuse light a bit
-    object_shader.setUniform("light.specular", glm::vec3(1.0f)); 
+    object_shader.setUniform("dir_light.ambient",  glm::vec3(0.1f));
+    object_shader.setUniform("dir_light.diffuse",  glm::vec3(1.0f)); // darken diffuse light a bit
+    object_shader.setUniform("dir_light.specular", glm::vec3(1.0f)); 
+    object_shader.setUniform("dir_light.direction", glm::vec3(0.0f, -1.0f, 1.0f)); 
     
+    object_shader.setUniform("spot_light.ambient",  glm::vec3(0.1f));
+    object_shader.setUniform("spot_light.diffuse",  glm::vec3(1.0f)); // darken diffuse light a bit
+    object_shader.setUniform("spot_light.specular", glm::vec3(1.0f)); 
     light_shader.use();
     
     model = glm::translate(model, light_pos);
@@ -518,8 +522,8 @@ int mainLight(int argc, char * argv[]){
         object_shader.setUniform("view",view);
         object_shader.setUniform("projection",proj);
         object_shader.setUniform("view_pos", camera.Position);
-       object_shader.setUniform("light.position", camera.Position);
-       object_shader.setUniform("light.direction", camera.Front);
+       object_shader.setUniform("spot_light.position", camera.Position);
+       object_shader.setUniform("spot_light.direction", camera.Front);
 
         for(unsigned int i = 0; i < std::size(shapes::cubePositions); i++){
             model = glm::mat4(1.0f);
