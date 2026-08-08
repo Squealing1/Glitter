@@ -69,26 +69,26 @@ void Shader::compileShader(const char vertex_shader_source[], const char fragmen
     glDeleteShader(fragment_shader);
 }
 
-void Shader::setUniform(const char name[], const glm::vec4 vec4){
-    unsigned int uniform_loc = glGetUniformLocation(shaderProgram, name);
-    glUniform4f(uniform_loc, vec4.x, vec4.y, vec4.z, vec4.w);
+void Shader::setUniform(std::string name, const bool truth){
+    unsigned int uniform_loc = glGetUniformLocation(shaderProgram, name.c_str());
+    glUniform1i(uniform_loc, truth);
 }
-void Shader::setUniform(const char name[], const glm::vec3 vec3){
-    unsigned int uniform_loc = glGetUniformLocation(shaderProgram, name);
+void Shader::setUniform(std::string name, const glm::vec3 vec3){
+    unsigned int uniform_loc = glGetUniformLocation(shaderProgram, name.c_str());
     glUniform3f(uniform_loc, vec3.x, vec3.y, vec3.z);
 }
-void Shader::setUniform(const char name[], const unsigned int integer){
-    unsigned int uniform_loc = glGetUniformLocation(shaderProgram, name);
+void Shader::setUniform(std::string name, const unsigned int integer){
+    unsigned int uniform_loc = glGetUniformLocation(shaderProgram, name.c_str());
     glUniform1i(uniform_loc, integer);
 }
-void Shader::setUniform(const char name[], const float floating){
-    unsigned int uniform_loc = glGetUniformLocation(shaderProgram, name);
+void Shader::setUniform(std::string name, const float floating){
+    unsigned int uniform_loc = glGetUniformLocation(shaderProgram, name.c_str());
     glUniform1f(uniform_loc, floating);
 }
-void Shader::setUniform(const char name[], const glm::mat4 mat4){
-    unsigned int uniform_loc = glGetUniformLocation(shaderProgram, name);
+void Shader::setUniform(std::string name, const glm::mat4 mat4){
+    unsigned int uniform_loc = glGetUniformLocation(shaderProgram, name.c_str());
     glUniformMatrix4fv(uniform_loc, 1, GL_FALSE, glm::value_ptr(mat4));
 }
-void Shader::setVec3(const char name[], const float x,const float y,const float z){
+void Shader::setVec3(std::string name, const float x,const float y,const float z){
     setUniform(name, glm::vec3(x,y,z));
 }

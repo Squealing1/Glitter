@@ -20,6 +20,8 @@
 #include <stb_image.h>
 #include <stdexcept>
 
+#include <sstream>
+
 // Main Programs
 int mainLight(int argc, char * argv[]);
 int mainCubes(int argc, char * argv[]);

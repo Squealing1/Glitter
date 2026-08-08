@@ -10,6 +10,8 @@ float lastX = (float)mWidth/2.0f;
 float lastY = (float)mHeight/2.0f;
 float fov = 30.0f;
 bool first_mouse = true;
+bool flash_light = true;
+bool flash_light_pressed = false;
 Camera camera(glm::vec3(1.0f,1.3f,3.0f), glm::vec3(0.0f,1.0f,0.0f), -100, -20);
 
 struct Material {
@@ -68,6 +70,13 @@ void processInput(GLFWwindow* mWindow, Camera& camera, float deltatime){
         camera.ProcessKeyboard(UP, deltatime);
     if (glfwGetKey(mWindow, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
         camera.ProcessKeyboard(DOWN, deltatime);
+    if (glfwGetKey(mWindow, GLFW_KEY_F) == GLFW_PRESS)
+        flash_light_pressed = true;
+    else if(flash_light_pressed){
+        flash_light_pressed = false;
+        flash_light = !flash_light;
+    }
+        
 }
 void processInput(GLFWwindow* mWindow, glm::vec3& cameraPos, glm::vec3 cameraFront, glm::vec3 cameraUp, float deltatime){
     float movementSpeed = 5.5;
@@ -450,7 +459,12 @@ int mainLight(int argc, char * argv[]){
     view = glm::translate(view, glm::vec3(0.0f,0.0f,-3.0f));
 
     glm::mat4 model(1.0f);
-    glm::vec3 light_pos(1.2f,1.0f,2.0f);
+    glm::vec3 light_positions[4] = {
+        glm::vec3(-10.2f,1.0f,2.0f),
+        glm::vec3(0.0f,-10.0f,2.0f),
+        glm::vec3(1.2f,0.0f,-10.0f),
+        glm::vec3(1.2f,1.0f,2.0f),
+    };
 
     Shader object_shader("Glitter/Shaders/light-object.vs", "Glitter/Shaders/light-object.fs");
     Shader light_shader("Glitter/Shaders/lamp.vs", "Glitter/Shaders/lamp.fs");
@@ -472,21 +486,41 @@ int mainLight(int argc, char * argv[]){
 
 
     object_shader.setUniform("dir_light.ambient",  glm::vec3(0.1f));
-    object_shader.setUniform("dir_light.diffuse",  glm::vec3(1.0f)); // darken diffuse light a bit
-    object_shader.setUniform("dir_light.specular", glm::vec3(1.0f)); 
-    object_shader.setUniform("dir_light.direction", glm::vec3(0.0f, -1.0f, 1.0f)); 
+    object_shader.setUniform("dir_light.diffuse",  glm::vec3(0.2f)); // darken diffuse light a bit
+    object_shader.setUniform("dir_light.specular", glm::vec3(0.2f)); 
+    object_shader.setUniform("dir_light.direction", glm::vec3(0.0f, 1.0f, 1.0f)); 
     
     object_shader.setUniform("spot_light.ambient",  glm::vec3(0.1f));
     object_shader.setUniform("spot_light.diffuse",  glm::vec3(1.0f)); // darken diffuse light a bit
     object_shader.setUniform("spot_light.specular", glm::vec3(1.0f)); 
+    glm::vec3 diffuses[4] = {
+        glm::vec3(1.0f,0.0f,0.0f),
+        glm::vec3(0.0f,1.0f,0.0f),
+        glm::vec3(0.0f,0.0f,1.0f),
+        glm::vec3(0.3f,0.3f,0.3f),
+    };
+
+    std::stringstream s ("");
+    for(int i = 0; i < 4; i ++){
+        s << "point_lights" << "[" << i << "]";
+        object_shader.setUniform(s.str() + ".ambient",  glm::vec3(0.1f));
+        object_shader.setUniform(s.str() + ".diffuse",  diffuses[i]); // darken diffuse light a bit
+        object_shader.setUniform(s.str() + ".specular", diffuses[i]); 
+        object_shader.setUniform(s.str() + ".position", light_positions[i]);
+        object_shader.setUniform(s.str() + ".constant", 1.0f);
+        object_shader.setUniform(s.str() + ".linear", .09f);
+        object_shader.setUniform(s.str() + ".quadratic", .032f);
+        s.str("");
+        s.clear();
+    }
+    
     light_shader.use();
     
-    model = glm::translate(model, light_pos);
-    model = glm::scale(model, glm::vec3(0.2f));
     light_shader.setUniform("projection", proj);
     light_shader.setUniform("view", view);
     light_shader.setUniform("model",model);
     light_shader.setUniform("aColor",glm::vec3(0.0f,1.0f,0.0f));
+
     
     
     
@@ -518,12 +552,22 @@ int mainLight(int argc, char * argv[]){
         light_shader.setUniform("projection",proj);
         light_shader.setUniform("view",view);
 
+        for(int i = 0; i < 4; i++){
+            model = glm::mat4(1.0f);
+            model = glm::translate(model, light_positions[i]);
+            model = glm::scale(model, glm::vec3(0.2f));
+            light_shader.setUniform("model", model);
+            light_shader.setUniform("aColor", diffuses[i]);
+            drawShape(VAO_T, EBO_O, light_shader, 36);
+        }
+
         object_shader.use();
         object_shader.setUniform("view",view);
         object_shader.setUniform("projection",proj);
         object_shader.setUniform("view_pos", camera.Position);
        object_shader.setUniform("spot_light.position", camera.Position);
        object_shader.setUniform("spot_light.direction", camera.Front);
+       object_shader.setUniform("spot_light.is_on", (bool)flash_light);
 
         for(unsigned int i = 0; i < std::size(shapes::cubePositions); i++){
             model = glm::mat4(1.0f);
@@ -535,7 +579,6 @@ int mainLight(int argc, char * argv[]){
         
         
 
-        drawShape(VAO_T, EBO_O, light_shader, 36);
 
 
         // Flip Buffers and Draw
