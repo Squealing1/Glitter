@@ -12,7 +12,6 @@ std::string readfile(const char filepath[]){
         s += line;        
         s += '\n';
     }
-    //std::string lines = "dog\ncat\nelephant";
     return s;
 }
 
