@@ -1,9 +1,11 @@
 #ifndef MESH
 #define MESH
+#include "assimp/types.h"
 #include "glm/ext/vector_float3.hpp"
 #include "glm/ext/vector_float2.hpp"
 #include "string"
 #include <shader.hpp>
+#include <stb_image.h>
 struct Vertex {
     glm::vec3 position;
     glm::vec3 normal;
@@ -13,6 +15,7 @@ struct Vertex {
 struct Texture {
     unsigned int id;
     std::string type;
+    std::string path;
 };
 
 class Mesh {

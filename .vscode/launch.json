@@ -2,6 +2,16 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "type": "lldb",
+            "request": "launch",
+            "name": "LLDB LAUNCH",
+            "program": "${command:cmake.launchTargetPath}",
+            "cwd": "${workspaceFolder}",
+        },
+
+
+
+        {
             "name": "(gdb) Launch",
             "type": "cppdbg",
             "request": "launch",
@@ -22,7 +32,7 @@
             "setupCommands": [
                 {
                     "description": "Enable pretty-printing for gdb",
-                    "text": "-enable-pretty-printing",
+                    "text": "-exec -enable-pretty-printing",
                     "ignoreFailures": true
                 }
             ]

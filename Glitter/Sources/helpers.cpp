@@ -223,10 +223,10 @@ void create_colored_textued_shape(unsigned int &VAO, unsigned int &VBO, unsigned
         glEnableVertexAttribArray(2);
     }
 
-void create_texture(unsigned int &texture, const char texture_filepath[], std::string filetype){
+void create_texture(unsigned int &texture, std::string texture_filepath, std::string filetype){
     int width, height, nrChannels;
     stbi_set_flip_vertically_on_load(true);
-    unsigned char* data = stbi_load(texture_filepath, &width, &height, &nrChannels, 0);
+    unsigned char* data = stbi_load(texture_filepath.c_str(), &width, &height, &nrChannels, 0);
     glGenTextures(1, &texture);
     
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -444,8 +444,8 @@ int mainLight(int argc, char * argv[]){
     glBindTexture(GL_TEXTURE_2D, specular_sampler_2d);
 
 
+    Model backpack("Glitter/Models/backpack/backpack.obj");
     
-    create_lamp_and_light_object(VAO_O, VAO_T, VBO_O, EBO_O, shapes::normal_textured_cube, 8*36, shapes::cube_ind, 36);
     
     
     
@@ -466,7 +466,7 @@ int mainLight(int argc, char * argv[]){
         glm::vec3(1.2f,1.0f,2.0f),
     };
 
-    Shader object_shader("Glitter/Shaders/light-object.vs", "Glitter/Shaders/light-object.fs");
+    Shader object_shader("Glitter/Shaders/mesh.vs", "Glitter/Shaders/mesh.fs");
     Shader light_shader("Glitter/Shaders/lamp.vs", "Glitter/Shaders/lamp.fs");
     object_shader.use();
     object_shader.setUniform("projection", proj);
@@ -569,14 +569,8 @@ int mainLight(int argc, char * argv[]){
        object_shader.setUniform("spot_light.direction", camera.Front);
        object_shader.setUniform("spot_light.is_on", (bool)flash_light);
 
-        for(unsigned int i = 0; i < std::size(shapes::cubePositions); i++){
-            model = glm::mat4(1.0f);
-            model = glm::translate(model, shapes::cubePositions[i]);
-            model = glm::rotate(model, glm::radians(15.0f)*(float)i, glm::vec3(0.4f,0.95f,0.2f));
-            object_shader.setUniform("model", model);
-            drawTexturedShape(VAO_O, EBO_O, object_shader, 36, diffuse_sampler_2d);
-        }
         
+       backpack.Draw(object_shader);
         
 
 

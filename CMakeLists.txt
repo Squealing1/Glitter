@@ -52,7 +52,9 @@ add_executable(${PROJECT_NAME}
     Glitter/Headers/shapes.hpp
     Glitter/Sources/shapes.cpp
     Glitter/Headers/mesh.hpp
-    Glitter/Sources/mesh.cpp)
+    Glitter/Sources/mesh.cpp
+    Glitter/Headers/model.hpp
+    Glitter/Sources/model.cpp)
 
 target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_17)
 

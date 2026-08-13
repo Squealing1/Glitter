@@ -9,6 +9,7 @@
 #include <shader.hpp>
 #include <camera.hpp>
 #include <shapes.hpp>
+#include <model.hpp>
 
 // System Headers
 #include <glad/glad.h>
@@ -44,7 +45,7 @@ void create_colored_textued_shape(unsigned int &VAO, unsigned int &VBO, unsigned
 void create_textured_shape(unsigned int &VAO, unsigned int &VBO, unsigned int& EBO, 
     const float vert[], unsigned int vert_cnt, const unsigned int ind[], 
     unsigned int ind_cnt);
-void create_texture(unsigned int &texture, const char texture_filepath[], std::string filetype);
+void create_texture(unsigned int &texture, std::string texture_filepath, std::string filetype);
 void create_lamp_and_light_object(unsigned int &VAO_O, unsigned int &VAO_T,unsigned int &VBO, unsigned int& EBO, 
     const float vert[], unsigned int vert_cnt, const unsigned int ind[], 
     unsigned int ind_cnt);
