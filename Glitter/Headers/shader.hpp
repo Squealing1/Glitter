@@ -26,9 +26,9 @@ class Shader {
         void setVec3(std::string name, const float x,const float y,const float z);
         void setUniform(std::string name, const bool truth);
 
+        unsigned int shaderProgram;
     
     private:
-        unsigned int shaderProgram;
         void compileShader(const char vertex_shader_source[], const char fragment_shader_source[]);
         std::string vertex_shader_filepath;
         std::string fragment_shader_filepath;

@@ -223,10 +223,10 @@ void create_colored_textued_shape(unsigned int &VAO, unsigned int &VBO, unsigned
         glEnableVertexAttribArray(2);
     }
 
-void create_texture(unsigned int &texture, std::string texture_filepath, std::string filetype){
+void create_texture(unsigned int &texture, const char texture_filepath[], std::string filetype){
     int width, height, nrChannels;
     stbi_set_flip_vertically_on_load(true);
-    unsigned char* data = stbi_load(texture_filepath.c_str(), &width, &height, &nrChannels, 0);
+    unsigned char* data = stbi_load(texture_filepath, &width, &height, &nrChannels, 0);
     glGenTextures(1, &texture);
     
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -444,9 +444,10 @@ int mainLight(int argc, char * argv[]){
     glBindTexture(GL_TEXTURE_2D, specular_sampler_2d);
 
 
+    
+    create_lamp_and_light_object(VAO_O, VAO_T, VBO_O, EBO_O, shapes::normal_textured_cube, 8*36, shapes::cube_ind, 36);
+
     Model backpack("Glitter/Models/backpack/backpack.obj");
-    
-    
     
     
     
@@ -478,8 +479,8 @@ int mainLight(int argc, char * argv[]){
     material.specular = 1;
     material.shininess  = 128.0f*0.25; 
 
-   object_shader.setUniform("material.diffuse",   material.diffuse);
-   object_shader.setUniform("material.specular",  material.specular);
+   object_shader.setUniform("material.texture_diffuse1",   material.diffuse);
+   object_shader.setUniform("material.texture_specular1",  material.specular);
    object_shader.setUniform("material.shininess", material.shininess); 
    object_shader.setUniform("spot_light.cut_off", glm::cos(glm::radians(14.5f)));
    object_shader.setUniform("spot_light.outer_cut_off", glm::cos(glm::radians(20.0f)));
@@ -569,9 +570,17 @@ int mainLight(int argc, char * argv[]){
        object_shader.setUniform("spot_light.direction", camera.Front);
        object_shader.setUniform("spot_light.is_on", (bool)flash_light);
 
+        //for(unsigned int i = 0; i < std::size(shapes::cubePositions); i++){
+        //    model = glm::mat4(1.0f);
+        //    model = glm::translate(model, shapes::cubePositions[i]);
+        //    model = glm::rotate(model, glm::radians(15.0f)*(float)i, glm::vec3(0.4f,0.95f,0.2f));
+        //    object_shader.setUniform("model", model);
+        //    drawTexturedShape(VAO_O, EBO_O, object_shader, 36, diffuse_sampler_2d);
+        //}
         
-       backpack.Draw(object_shader);
-        
+        model = glm::mat4(1.0f);
+        object_shader.setUniform("model", model);
+        backpack.Draw(object_shader);
 
 
 
